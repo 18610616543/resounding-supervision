@@ -1,5 +1,5 @@
 /**
- * EchoCare · 控制台 — 前端应用 v2
+ * resounding-supervision · 控制台 — 前端应用 v2
  * ==========================================================
  * 功能：智能体管理 / 性别语音联动 / 预设+自定人格双分支
  *       AI润色 / 二次确认 / 实时预览 / 分享码
@@ -248,7 +248,7 @@ function buildPresetPrompt(presetIds, gender, agentName) {
 
 // ======================== 存储层 ========================
 const Storage = {
-  _key(k) { return 'echocare_' + k; },
+  _key(k) { return 'resounding-supervision_' + k; },
   get(k, fb = null) { try { const v = localStorage.getItem(this._key(k)); return v ? JSON.parse(v) : fb; } catch { return fb; } },
   set(k, v) { localStorage.setItem(this._key(k), JSON.stringify(v)); },
   remove(k) { localStorage.removeItem(this._key(k)); }
@@ -272,10 +272,10 @@ const Auth = {
   _init() {
     if (!this._users) {
       this._users = Storage.get('users', {});
-      if (!this._users['demo@echocare.ai']) {
-        this._users['demo@echocare.ai'] = {
-          username: 'demo', email: 'demo@echocare.ai',
-          password: this._h('echocare2024'), createdAt: Date.now()
+      if (!this._users['demo@resounding-supervision.ai']) {
+        this._users['demo@resounding-supervision.ai'] = {
+          username: 'demo', email: 'demo@resounding-supervision.ai',
+          password: this._h('resounding-supervision2024'), createdAt: Date.now()
         };
         this._save();
       }
@@ -463,7 +463,7 @@ const App = {
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `echocare-backup-${new Date().toISOString().slice(0,10)}.json`;
+    a.href = url; a.download = `resounding-supervision-backup-${new Date().toISOString().slice(0,10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
     Toast.show('备份已下载', 'success');
