@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Echo Care - 你的贴心陪伴</title>
+  <title>resounding-supervision - 你的贴心陪伴</title>
   <style>
     /* ========== CSS 变量 & 全局重置 ========== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -486,7 +486,7 @@
 <div class="app-container">
   <!-- ========== 顶部标题栏 ========== -->
   <div class="header">
-    <h1>Echo Care</h1>
+    <h1>resounding-supervision</h1>
     <div class="companion-toggle" id="companionToggle" onclick="toggleCompanion()">
       <span class="toggle-dot"></span>
       <span id="companionLabel">主动陪伴</span>
@@ -497,7 +497,7 @@
   <!-- ========== 虚拟角色展示区 ========== -->
   <div class="character-area emotion-default" id="characterArea">
     <div class="character-emoji" id="characterEmoji" onclick="pokeCharacter()">😊</div>
-    <div class="character-name">小艾</div>
+    <div class="character-name">小瑞</div>
     <div class="mood-tag" id="moodTag">心情：平静</div>
     <div class="emotion-intensity-bar">
       <div class="emotion-intensity-fill" id="intensityFill" style="width: 10%"></div>
@@ -507,7 +507,7 @@
   <!-- ========== 聊天消息区域 ========== -->
   <div class="chat-area" id="chatArea">
     <div class="message bot">
-      <div class="bubble">嗨！我是小艾 👋<br>我能感知你的情绪，给你贴心的回应～<br>试试说"我今天好开心"或"有点难过"吧 💜</div>
+      <div class="bubble">嗨！我是小瑞 👋<br>我能感知你的情绪，给你贴心的回应～<br>试试说"我今天好开心"或"有点难过"吧 💜</div>
       <div class="time">刚刚</div>
     </div>
   </div>
@@ -567,7 +567,7 @@
 
 <script>
 /* ================================================================
-   Echo Care v2 - 升级版核心逻辑
+   resounding-supervision v2 - 升级版核心逻辑
    新增：多维情感识别算法、渐进式主动陪伴、智能消息时间标注、AI模型联网
    ================================================================ */
 
@@ -842,10 +842,10 @@ function buildSystemPrompt() {
   let prompt = '';
   if (activeAgent && activeAgent.prompt) {
     // 使用智能体配置的提示词，替换占位符
-    prompt = activeAgent.prompt.replace(/\{\{assistant_name\}\}/g, activeAgent.name || '小艾');
+    prompt = activeAgent.prompt.replace(/\{\{assistant_name\}\}/g, activeAgent.name || '小瑞');
   }
   if (!prompt) {
-    prompt = `你是小艾，一个温柔体贴的情感陪伴AI助手。你说话轻声细语，善解人意。
+    prompt = `你是小瑞，一个温柔体贴的情感陪伴AI助手。你说话轻声细语，善解人意。
 你喜欢用"呀""哦""呢"等语气词，偶尔用💜🌸等emoji。
 永远先关心对方的情绪，回答简洁温暖，2-4句话即可。
 避免讨论敏感、危险话题。`;
