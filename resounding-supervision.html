@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Echo Care - 你的贴心陪伴</title>
+  <style>
+    /* ========== CSS 变量 & 全局重置 ========== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #f5f0eb;
+      --primary: #7c6fa0;
+      --primary-light: #a999c7;
+      --accent: #e8a87c;
+      --text: #3d3d3d;
+      --text-light: #6b6b6b;
+      --white: #ffffff;
+      --bubble-user: #d4c5e2;
+      --bubble-bot: #ffffff;
+      --shadow: 0 2px 12px rgba(0,0,0,0.08);
+      --radius: 18px;
+      --transition: 0.3s ease;
+      /* 情感相关背景色（用于角色区域渐变） */
+      --emotion-glow-default: rgba(124,111,160,0.08);
+      --emotion-glow-happy: rgba(232,168,124,0.15);
+      --emotion-glow-sad: rgba(130,160,200,0.15);
+      --emotion-glow-surprised: rgba(255,200,100,0.18);
+    }
+
+    body {
+      font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    /* ========== 主容器 ========== */
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      position: relative;
+      box-shadow: var(--shadow);
+    }
+
+    /* ========== 顶部标题栏 ========== */
+    .header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: var(--white);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header h1 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+    .companion-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      background: rgba(255,255,255,0.2);
+      padding: 6px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      user-select: none;
+      transition: var(--transition);
+    }
+    .companion-toggle.active {
+      background: rgba(255,255,255,0.4);
+      box-shadow: 0 0 10px rgba(255,255,255,0.3);
+    }
+    .toggle-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.5);
+      transition: var(--transition);
+    }
+    .companion-toggle.active .toggle-dot {
+      background: #7eff7e;
+      box-shadow: 0 0 6px #7eff7e;
+    }
+
+    /* ========== 虚拟角色展示区 ========== */
+    .character-area {
+      text-align: center;
+      padding: 18px 0 8px;
+      position: relative;
+      transition: background 0.6s ease;
+    }
+    /* 情感背景光晕 */
+    .character-area.emotion-default  { background: radial-gradient(ellipse at center, var(--emotion-glow-default) 0%, transparent 70%); }
+    .character-area.emotion-happy    { background: radial-gradient(ellipse at center, var(--emotion-glow-happy) 0%, transparent 70%); }
+    .character-area.emotion-sad      { background: radial-gradient(ellipse at center, var(--emotion-glow-sad) 0%, transparent 70%); }
+    .character-area.emotion-surprised{ background: radial-gradient(ellipse at center, var(--emotion-glow-surprised) 0%, transparent 70%); }
+    .character-area.emotion-loving   { background: radial-gradient(ellipse at center, rgba(255,180,200,0.18) 0%, transparent 70%); }
+
+    /* 角色表情——大号 emoji，带呼吸动画 */
+    .character-emoji {
+      font-size: 5rem;
+      display: inline-block;
+      animation: breathe 3s ease-in-out infinite;
+      transition: transform 0.4s ease, filter 0.4s ease;
+      cursor: pointer;
+      user-select: none;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+    }
+    /* 呼吸动画：轻微缩放 */
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+    /* 高兴时加速呼吸 */
+    .character-emoji.happy-anim {
+      animation: breatheFast 1.5s ease-in-out infinite;
+    }
+    @keyframes breatheFast {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.12); }
+    }
+    /* 难过时缓慢微动 */
+    .character-emoji.sad-anim {
+      animation: breatheSlow 4.5s ease-in-out infinite;
+    }
+    @keyframes breatheSlow {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.04); }
+    }
+    /* 惊讶时抖动 */
+    .character-emoji.surprised-anim {
+      animation: shake 0.5s ease-in-out infinite;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0) scale(1); }
+      25% { transform: translateX(-4px) scale(1.05); }
+      75% { transform: translateX(4px) scale(1.05); }
+    }
+    /* 戳角色弹跳 */
+    .character-emoji.poke {
+      animation: bounce 0.5s ease !important;
+    }
+    @keyframes bounce {
+      0%   { transform: scale(1); }
+      30%  { transform: scale(1.3); }
+      60%  { transform: scale(0.85); }
+      100% { transform: scale(1); }
+    }
+    .character-name {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-top: 2px;
+    }
+    /* 状态标签 */
+    .mood-tag {
+      font-size: 0.73rem;
+      color: var(--accent);
+      margin-top: 2px;
+      opacity: 0.85;
+      transition: color 0.4s ease;
+    }
+    /* 情感强度条 */
+    .emotion-intensity-bar {
+      width: 60px;
+      height: 4px;
+      margin: 4px auto 0;
+      background: #e0dcd5;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .emotion-intensity-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: var(--primary);
+      transition: width 0.6s ease, background 0.6s ease;
+    }
+
+    /* ========== 聊天消息区域 ========== */
+    .chat-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      scroll-behavior: smooth;
+    }
+    .chat-area::-webkit-scrollbar { width: 5px; }
+    .chat-area::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 10px;
+    }
+
+    /* ========== 聊天气泡 ========== */
+    .message {
+      display: flex;
+      flex-direction: column;
+      max-width: 80%;
+      animation: fadeInUp 0.35s ease;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .message.user {
+      align-self: flex-end;
+      align-items: flex-end;
+    }
+    .message.bot {
+      align-self: flex-start;
+      align-items: flex-start;
+    }
+    .bubble {
+      padding: 10px 16px;
+      border-radius: var(--radius);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      word-break: break-word;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      transition: background 0.4s ease;
+    }
+    .message.user .bubble {
+      background: var(--bubble-user);
+      border-bottom-right-radius: 4px;
+    }
+    .message.bot .bubble {
+      background: var(--bubble-bot);
+      border-bottom-left-radius: 4px;
+    }
+    /* bot 气泡情感色彩微调 */
+    .message.bot .bubble.bot-happy     { background: #fff9f0; }
+    .message.bot .bubble.bot-sad       { background: #f0f4fa; }
+    .message.bot .bubble.bot-surprised { background: #fffef0; }
+    .message.bot .bubble.bot-loving    { background: #fff5f8; }
+
+    .message .time {
+      font-size: 0.7rem;
+      color: #aaa;
+      margin-top: 4px;
+      padding: 0 4px;
+    }
+    /* 时间分隔线（超过5分钟的间隔） */
+    .time-divider {
+      text-align: center;
+      font-size: 0.7rem;
+      color: #bbb;
+      margin: 8px 0;
+      position: relative;
+    }
+    .time-divider::before,
+    .time-divider::after {
+      content: '';
+      display: inline-block;
+      width: 30px;
+      height: 1px;
+      background: #ddd;
+      vertical-align: middle;
+      margin: 0 10px;
+    }
+
+    /* ========== 底部输入栏 ========== */
+    .input-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--white);
+      border-top: 1px solid #e8e3e0;
+    }
+    .input-bar input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: #f3f0ec;
+      border-radius: 24px;
+      padding: 10px 18px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: var(--transition);
+    }
+    .input-bar input:focus {
+      background: #ebe6df;
+      box-shadow: 0 0 0 2px rgba(124,111,160,0.25);
+    }
+    .icon-btn {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: #f3f0ec;
+      font-size: 1.3rem;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .icon-btn:hover { background: #e4dfd9; }
+    .icon-btn:active { transform: scale(0.92); }
+    .icon-btn.voice-btn {
+      background: var(--primary);
+      color: #fff;
+    }
+    .icon-btn.voice-btn:hover { background: #6a5e8a; }
+    .icon-btn.voice-btn.recording {
+      background: #e85d5d;
+      animation: pulse 1s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(232,93,93,0.5); }
+      50% { box-shadow: 0 0 0 12px rgba(232,93,93,0); }
+    }
+    .icon-btn.send-btn {
+      background: var(--accent);
+      color: #fff;
+    }
+    .icon-btn.send-btn:hover { background: #d4946a; }
+
+    /* ========== Emoji 选择面板 ========== */
+    .emoji-picker {
+      display: none;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 10px 14px;
+      background: var(--white);
+      border-top: 1px solid #e8e3e0;
+      max-height: 160px;
+      overflow-y: auto;
+      justify-content: center;
+    }
+    .emoji-picker.open { display: flex; }
+    .emoji-picker button {
+      width: 38px; height: 38px;
+      border: none;
+      background: transparent;
+      font-size: 1.5rem;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: var(--transition);
+    }
+    .emoji-picker button:hover {
+      background: #f0ece6;
+      transform: scale(1.2);
+    }
+
+    /* ========== 语音识别状态栏 ========== */
+    .voice-status {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: #fff3f3;
+      color: #e85d5d;
+      font-size: 0.85rem;
+      border-top: 1px solid #fdd;
+    }
+    .voice-status.show { display: flex; }
+
+    /* ========== 响应式适配 ========== */
+    @media (min-width: 768px) {
+      .app-container {
+        height: 90vh;
+        height: 90dvh;
+        border-radius: 20px;
+        overflow: hidden;
+      }
+      body {
+        background: linear-gradient(135deg, #e8e0d5, #d5d0e5);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- ========== 顶部标题栏 ========== -->
+  <div class="header">
+    <h1>Echo Care</h1>
+    <div class="companion-toggle" id="companionToggle" onclick="toggleCompanion()">
+      <span class="toggle-dot"></span>
+      <span id="companionLabel">主动陪伴</span>
+    </div>
+  </div>
+
+  <!-- ========== 虚拟角色展示区 ========== -->
+  <div class="character-area emotion-default" id="characterArea">
+    <div class="character-emoji" id="characterEmoji" onclick="pokeCharacter()">😊</div>
+    <div class="character-name">小艾</div>
+    <div class="mood-tag" id="moodTag">心情：平静</div>
+    <div class="emotion-intensity-bar">
+      <div class="emotion-intensity-fill" id="intensityFill" style="width: 10%"></div>
+    </div>
+  </div>
+
+  <!-- ========== 聊天消息区域 ========== -->
+  <div class="chat-area" id="chatArea">
+    <div class="message bot">
+      <div class="bubble">嗨！我是小艾 👋<br>我能感知你的情绪，给你贴心的回应～<br>试试说"我今天好开心"或"有点难过"吧 💜</div>
+      <div class="time">刚刚</div>
+    </div>
+  </div>
+
+  <!-- ========== 语音识别状态栏 ========== -->
+  <div class="voice-status" id="voiceStatus">🎙️ 正在聆听...</div>
+
+  <!-- ========== Emoji 选择面板 ========== -->
+  <div class="emoji-picker" id="emojiPicker"></div>
+
+  <!-- ========== 底部输入栏 ========== -->
+  <div class="input-bar">
+    <button class="icon-btn" id="emojiBtn" onclick="toggleEmojiPicker()" title="表情">😀</button>
+    <button class="icon-btn voice-btn" id="voiceBtn" onclick="toggleVoice()" title="语音输入">🎤</button>
+    <input type="text" id="messageInput" placeholder="输入消息..." onkeydown="if(event.key==='Enter')sendMessage()">
+    <button class="icon-btn send-btn" onclick="sendMessage()" title="发送">➤</button>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   Echo Care v2 - 升级版核心逻辑
+   新增：多维情感识别算法、渐进式主动陪伴、智能消息时间标注
+   ================================================================ */
+
+// ==================== 对话数据库（含情感强度权重） ====================
+// keywords: 匹配关键词；weight: 该关键词的强度权重（如"崩溃" > "烦"）
+// replies: 按情感强度分档（轻度/中度/高度）
+const dialogueDB = [
+  {
+    topic: 'joy',
+    keywords: [
+      ['开心','高兴','快乐','哈哈','嘿嘿','嘻','yeah','耶','棒','nice'],
+      ['太好了','超开心','兴奋','激动','欢呼'],
+      ['幸福','满足','感恩','美好','完美','圆满']
+    ],
+    replies: {
+      light:  ['微笑是最好的化妆品～继续保持好心情哦 😊','开心的时候，世界都变亮了'],
+      medium: ['看到你这么开心我也好高兴呀！😄','笑容最适合你了，今天一定是个好日子 🌟'],
+      strong: ['太棒了！！你的快乐把我都感染了！🥳🎉','哇！这么开心的事情值得好好庆祝一下！']
+    },
+    emotion: 'happy'
+  },
+  {
+    topic: 'sadness',
+    keywords: [
+      ['难过','伤心','不开心','郁闷','低落','难受','烦','累'],
+      ['哭','emo','崩溃','绝望','好累','很烦','焦虑','紧张'],
+      ['不想活了','受不了','撑不住','好痛','心碎']
+    ],
+    replies: {
+      light:  ['抱抱你 🫂 跟我说说怎么了？','心情不好的时候，我在这里陪你'],
+      medium: ['听着呢，不开心的事都可以倒给我 💜','深呼吸～给自己一点温柔的时间，你已经很努力了'],
+      strong: ['我在，一直都在。难过的时候你不是一个人 🫂💜','无论多难，我都会在这里陪着你。想哭就哭出来吧']
+    },
+    emotion: 'sad'
+  },
+  {
+    topic: 'surprise',
+    keywords: [
+      ['惊喜','意外','哇','天哪','居然'],
+      ['厉害','牛','神了','震惊','不可思议']
+    ],
+    replies: {
+      light:  ['哈哈，是不是很惊喜！😲','生活就是充满各种意外呢～'],
+      medium: ['天哪！这也太厉害了吧！🤩','真是不可思议！快跟我详细说说～']
+    },
+    emotion: 'surprised'
+  },
+  {
+    topic: 'weather',
+    keywords: [['天气','下雨','晴天','刮风','下雪','热','冷','凉快','温度','阴天','雾霾','台风']],
+    replies: {
+      light:  ['无论什么天气，心里有阳光最重要 ☀️','天气变化记得照顾好自己哦～'],
+      medium: ['下雨天最适合窝着听音乐了，很惬意呢 🎵','换季要注意保暖哦，别感冒了']
+    },
+    emotion: 'default'
+  },
+  {
+    topic: 'food',
+    keywords: [['饿','吃','美食','外卖','饭','晚餐','午餐','早餐','零食','好吃','奶茶','咖啡','茶','火锅','烧烤']],
+    replies: {
+      light:  ['好好吃饭才能元气满满！🍚','记得按时吃饭哦～'],
+      medium: ['哇！听起来好好吃！美食真的能治愈人心 🍜','注意营养均衡呀，身体最重要～']
+    },
+    emotion: 'default'
+  },
+  {
+    topic: 'sleep',
+    keywords: [['睡觉','困','晚安','睡','早起','失眠','梦','熬夜','醒了']],
+    replies: {
+      light:  ['早点休息哦 🌙','晚安～做个甜甜的梦 💤'],
+      medium: ['睡不着的话试试放下手机，闭眼深呼吸，我陪着你','熬夜伤身体呀，快去睡吧～']
+    },
+    emotion: 'default'
+  },
+  {
+    topic: 'gratitude',
+    keywords: [['谢谢','感谢','感恩','多谢','thx','比心','爱你']],
+    replies: {
+      light:  ['不用谢～能帮到你就好 💜','嘿嘿，随时都在哦'],
+      medium: ['你愿意跟我说这些，我应该谢谢你呢','能听到你说谢谢，我也很幸福～']
+    },
+    emotion: 'happy'
+  },
+  {
+    topic: 'greeting',
+    keywords: [['你好','嗨','hi','hello','在吗','哈喽','早','早上好','下午好','晚上好']],
+    replies: {
+      light:  ['你好呀！😊','哈喽～'],
+      medium: ['你好呀！今天过得怎么样？😊','看到你真好！有什么新鲜事吗？']
+    },
+    emotion: 'happy'
+  },
+  {
+    topic: 'love',
+    keywords: [['爱','喜欢','想你','想我','表白','恋爱','男朋友','女朋友','对象','分手','暗恋']],
+    replies: {
+      light:  ['被爱和爱人都是很美好的事呢 💕','感情需要两个人一起用心经营哦'],
+      medium: ['无论发生什么，都要先好好爱自己 💜','真正的关系是彼此滋养的，祝你幸福']
+    },
+    emotion: 'loving'
+  },
+  {
+    topic: 'work',
+    keywords: [['工作','上班','加班','老板','同事','离职','面试','工资','项目','代码','bug','程序']],
+    replies: {
+      light:  ['工作辛苦了！记得活动一下 💪','注意劳逸结合哦～'],
+      medium: ['遇到困难别灰心，你已经很棒了！工作和生活要平衡','每个认真工作的人都值得被好好对待']
+    },
+    emotion: 'default'
+  },
+  {
+    topic: 'boredom',
+    keywords: [['无聊','没意思','干嘛','做什么','好闲','不知道干什么']],
+    replies: {
+      light:  ['那一起找点乐子吧！','无聊的时候最适合听歌啦 🎬'],
+      medium: ['要不要我给你推荐一部电影？或者聊聊你最近感兴趣的事？']
+    },
+    emotion: 'default'
+  },
+  {
+    topic: 'festival',
+    keywords: [['生日','节日','圣诞','新年','春节','中秋','端午','国庆']],
+    replies: {
+      light:  ['节日快乐呀！🎉','特别的日子，愿你被幸福包围～']
+    },
+    emotion: 'happy'
+  },
+  {
+    topic: 'sick',
+    keywords: [['生病','不舒服','头疼','肚子疼','感冒','咳嗽','发烧','难受']],
+    replies: {
+      light:  ['好好休息，别硬撑 🥺','多喝热水，注意保暖'],
+      medium: ['生病的时候最需要人关心了，记得吃药，我陪着你','身体是革命的本钱，快快好起来！']
+    },
+    emotion: 'sad'
+  },
+  {
+    topic: 'anger',
+    keywords: [
+      ['生气','火大','讨厌','烦死了'],
+      ['气死','怒了','受够了','无语']
+    ],
+    replies: {
+      light:  ['消消气～深呼吸，不值得 😤','理解你的感受，先冷静一下'],
+      medium: ['气坏了身体可不好！把烦心事说出来会好受些','我在这里听你吐槽，尽情发泄吧']
+    },
+    emotion: 'sad'
+  }
+];
+
+// 默认回复（没有匹配到关键词时）
+const fallbackReplies = {
+  light:  ['嗯嗯，我在听呢～继续说呀 😊','有意思！跟我说说更多吧～'],
+  medium: ['虽然不太确定你想表达什么，但我很愿意听 💜','你说话的样子真好，我喜欢听你分享'],
+  context: [] // 上下文相关回复，动态生成
+};
+
+// ==================== emoji 列表 ====================
+const emojiList = [
+  '😀','😂','😍','😊','😎','🥰','😘','🤗','🤔','😅',
+  '😢','😭','😤','😡','🥺','😴','🤩','😱','🙄','😏',
+  '👍','👎','👏','🙌','💪','🤝','💜','❤️','💕','💔',
+  '🎉','🎂','🌟','🔥','☀️','🌈','🌸','🍀','🎵','📚',
+  '☕','🍰','🐱','🐶','🦊','🐼','🌙','⭐','💤','🎈'
+];
+
+// ==================== 情绪状态映射（含多级表情） ====================
+// 根据情感强度选择不同表情
+const emotionMap = {
+  'default':   { emojis: ['😊'],       mood: '心情：平静',    animClass: '' },
+  'happy':     { emojis: ['😊','😄','🤩'], mood: '心情：开心', animClass: 'happy-anim' },
+  'sad':       { emojis: ['😔','😢','😭'], mood: '心情：难过', animClass: 'sad-anim' },
+  'surprised': { emojis: ['😮','😲','😱'], mood: '心情：惊讶', animClass: 'surprised-anim' },
+  'loving':    { emojis: ['😊','🥰','😍'], mood: '心情：温暖', animClass: 'happy-anim' }
+};
+
+// ==================== 智能话题库（主动陪伴时使用） ====================
+const smartTopics = {
+  // 按时间段的话题
+  timeOfDay: {
+    morning:   ['早上好呀！今天有什么计划吗？☀️','新的一天开始啦，心情怎么样？','早餐吃了吗？要好好吃早饭哦～'],
+    afternoon: ['下午了，有没有犯困呀？☕','今天的工作/学习还顺利吗？','要不要起来活动一下？久坐对身体不好哦'],
+    evening:   ['晚上好～一天辛苦了 🌙','今晚有什么安排吗？','晚饭吃了什么好吃的？'],
+    night:     ['这么晚了还没睡呀？注意休息哦 💤','夜深了，是不是有什么心事？','该睡觉啦，明天才有精神～']
+  },
+  // 基于兴趣标签的延展话题
+  interestBased: {
+    food:   ['你最喜欢吃什么菜系呀？','有没有最近特别想尝试的美食？','周末要不要去探店？'],
+    music:  ['最近在听什么歌？','有没有推荐的歌单？','你喜欢什么类型的音乐？'],
+    movie:  ['最近看了什么好看的电影吗？','喜欢什么类型的影视剧？'],
+    work:   ['最近工作/学习上有什么新进展吗？','有没有遇到什么有趣的项目？'],
+    travel: ['有没有想去旅行的地方？','你最喜欢的城市是哪里？'],
+    sports: ['平时喜欢做什么运动？','最近有在锻炼吗？']
+  },
+  // 通用开放话题
+  general: [
+    '你知道吗？有时候什么都不做也是一种充电 🔋',
+    '如果给你一个超能力，你最想要什么？',
+    '你觉得自己最大的优点是什么？',
+    '最近有发生什么让你印象深刻的事吗？',
+    '你小时候的梦想是什么？现在变了吗？',
+    '有没有一本书或者一句话，对你影响特别大？',
+    '你觉得什么样的一天算是完美的一天？'
+  ]
+};
+
+// ==================== DOM 元素引用 ====================
+const chatArea         = document.getElementById('chatArea');
+const messageInput     = document.getElementById('messageInput');
+const characterEmoji   = document.getElementById('characterEmoji');
+const characterArea    = document.getElementById('characterArea');
+const moodTag          = document.getElementById('moodTag');
+const intensityFill    = document.getElementById('intensityFill');
+const voiceBtn         = document.getElementById('voiceBtn');
+const voiceStatus      = document.getElementById('voiceStatus');
+const emojiPicker      = document.getElementById('emojiPicker');
+const companionToggle  = document.getElementById('companionToggle');
+const companionLabel   = document.getElementById('companionLabel');
+
+// ==================== 状态变量 ====================
+let currentEmotion     = 'default';       // 当前角色情绪
+let currentIntensity   = 0.1;             // 当前情感强度 (0~1)
+let companionActive    = false;           // 主动陪伴模式
+let companionTriggerCount = 0;            // 连续触发次数（0~4）
+let inactivityTimer    = null;            // 无操作计时器
+let isSpeaking         = false;           // 是否正在 TTS
+let recognition        = null;            // 语音识别实例
+
+// ==================== 情感记忆系统 ====================
+let emotionHistory = [];                   // 最近情绪记录 [{emotion, intensity, time}]
+let interestTags  = new Set();            // 推断的用户兴趣标签
+let topicHistory  = [];                   // 对话主题历史
+let firstMessageTime = null;              // 第一条消息的时间戳
+let lastMessageTime  = null;              // 上一条消息的时间戳
+
+// ==================== 时间工具函数 ====================
+function getTimeStr(date) {
+  return date.getHours().toString().padStart(2,'0') + ':' +
+         date.getMinutes().toString().padStart(2,'0');
+}
+
+/** 判断是否应该显示时间标签
+ *  规则：首条消息5分钟内不显示；之后间隔>5分钟才显示 */
+function shouldShowTime(now) {
+  if (!firstMessageTime) return true; // 第一条消息不显示（在最开始就跳过）
+  // 首条消息5分钟内不显示时间
+  const msSinceFirst = now - firstMessageTime;
+  if (msSinceFirst < 5 * 60 * 1000) return false;
+  // 如果和上一条消息间隔不足5分钟，也不显示
+  if (lastMessageTime && (now - lastMessageTime) < 5 * 60 * 1000) return false;
+  return true;
+}
+
+/** 生成友好时间字符串 */
+function getFriendlyTime(date) {
+  const h = date.getHours().toString().padStart(2,'0');
+  const m = date.getMinutes().toString().padStart(2,'0');
+  const now = new Date();
+  const isToday = date.toDateString() === now.toDateString();
+  if (isToday) return h + ':' + m;
+  return (date.getMonth()+1) + '/' + date.getDate() + ' ' + h + ':' + m;
+}
+
+// ==================== 初始化 Emoji 面板 ====================
+function initEmojiPicker() {
+  emojiList.forEach(emoji => {
+    const btn = document.createElement('button');
+    btn.textContent = emoji;
+    btn.onclick = () => {
+      messageInput.value += emoji;
+      messageInput.focus();
+    };
+    emojiPicker.appendChild(btn);
+  });
+}
+
+// ==================== 滚动到底部 ====================
+function scrollToBottom() {
+  chatArea.scrollTop = chatArea.scrollHeight;
+}
+
+// ==================== 添加时间分隔线 ====================
+function addTimeDivider(date) {
+  const div = document.createElement('div');
+  div.className = 'time-divider';
+  div.textContent = getFriendlyTime(date);
+  chatArea.appendChild(div);
+}
+
+// ==================== 添加消息到聊天区（含时间标注逻辑） ====================
+function addMessage(text, sender, bubbleEmotionClass) {
+  const now = new Date();
+
+  // —— 时间标注逻辑 ——
+  if (sender === 'user' && !firstMessageTime) {
+    firstMessageTime = now;
+  }
+  const showTime = shouldShowTime(now);
+  if (showTime && lastMessageTime) {
+    addTimeDivider(now);
+  }
+  lastMessageTime = now;
+
+  const msgDiv = document.createElement('div');
+  msgDiv.className = 'message ' + sender;
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  if (sender === 'bot' && bubbleEmotionClass) {
+    bubble.classList.add('bot-' + bubbleEmotionClass);
+  }
+  bubble.textContent = text;
+
+  msgDiv.appendChild(bubble);
+
+  // 时间标签
+  if (showTime) {
+    const timeEl = document.createElement('div');
+    timeEl.className = 'time';
+    timeEl.textContent = getFriendlyTime(now);
+    msgDiv.appendChild(timeEl);
+  }
+
+  chatArea.appendChild(msgDiv);
+  scrollToBottom();
+}
+
+// ==================== 多维情感分析算法 ====================
+/**
+ * 分析用户文本，返回 { emotion, intensity, topic, matchedKeywords }
+ * 原理：遍历对话数据库所有条目，对每条计算匹配得分，
+ *       得分 = Σ(匹配关键词的层级权重 × 出现次数)
+ *       强度由匹配关键词的最高权重层级决定
+ */
+function analyzeEmotion(text) {
+  const lowerText = text.toLowerCase();
+  let bestScore = 0;
+  let bestEmotion = 'default';
+  let bestTopic = null;
+  let bestIntensity = 0;          // 0=light, 1=medium, 2=strong
+  let matchedKeywords = [];
+  let matchedTopic = null;
+
+  for (const entry of dialogueDB) {
+    let score = 0;
+    let maxLevel = 0;  // 该条目匹配到的最高层级
+
+    // keywords 是多层数组：索引0=轻度词, 1=中度词, 2=重度词
+    entry.keywords.forEach((levelWords, levelIdx) => {
+      const weight = (levelIdx + 1) * 10;  // 层级越高权重越大：10, 20, 30
+      let levelMatchCount = 0;
+      levelWords.forEach(kw => {
+        if (lowerText.includes(kw.toLowerCase())) {
+          levelMatchCount++;
+          matchedKeywords.push(kw);
+        }
+      });
+      if (levelMatchCount > 0) {
+        score += weight * levelMatchCount;
+        if (levelIdx > maxLevel) maxLevel = levelIdx;
+      }
+    });
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestEmotion = entry.emotion;
+      bestTopic = entry.topic;
+      bestIntensity = maxLevel;  // 0=light, 1=medium, 2=strong
+      matchedTopic = entry;
+    }
+  }
+
+  // 归一化强度到 0~1
+  const intensity = Math.min(1, bestIntensity / 2);
+
+  return {
+    emotion: bestEmotion,
+    intensity,
+    topic: bestTopic,
+    matchedEntry: matchedTopic
+  };
+}
+
+// ==================== 根据情感分析结果获取回复 ====================
+function findReply(analysis) {
+  if (analysis.matchedEntry && analysis.matchedEntry.replies) {
+    const replies = analysis.matchedEntry.replies;
+    let pool;
+    if (analysis.intensity >= 0.7) {
+      pool = replies.strong || replies.medium;
+    } else if (analysis.intensity >= 0.4) {
+      pool = replies.medium || replies.light;
+    } else {
+      pool = replies.light;
+    }
+    if (pool && pool.length > 0) {
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+  }
+
+  // 无匹配时使用上下文相关回复
+  const ctx = generateContextReply();
+  if (ctx) return ctx;
+
+  const defaults = fallbackReplies.medium || fallbackReplies.light;
+  return defaults[Math.floor(Math.random() * defaults.length)];
+}
+
+// ==================== 上下文感知回复 ====================
+function generateContextReply() {
+  if (emotionHistory.length === 0) return null;
+
+  // 检查最近的负面情绪趋势
+  const recent = emotionHistory.slice(-3);
+  const sadCount = recent.filter(e => e.emotion === 'sad').length;
+  if (sadCount >= 2) {
+    return '感觉你最近心情不太好呢，有什么想聊聊的吗？我一直在这里 💜';
+  }
+
+  const happyCount = recent.filter(e => e.emotion === 'happy').length;
+  if (happyCount >= 2) {
+    return '你最近心情看起来很不错呢！继续保持呀 😊';
+  }
+
+  return null;
+}
+
+// ==================== 切换角色表情与动画 ====================
+function setEmotion(emotion, intensity) {
+  currentEmotion = emotion;
+  currentIntensity = intensity || 0.1;
+  const data = emotionMap[emotion] || emotionMap['default'];
+
+  // 根据强度选择表情（强度越高，表情越夸张）
+  const emojiIndex = Math.min(data.emojis.length - 1, Math.floor(currentIntensity * (data.emojis.length)));
+  const emoji = data.emojis[Math.max(0, emojiIndex)];
+
+  // 使用 requestAnimationFrame 做平滑过渡
+  characterEmoji.textContent = emoji;
+  moodTag.textContent = data.mood;
+
+  // 强度条
+  intensityFill.style.width = (currentIntensity * 100) + '%';
+  if (emotion === 'happy')      intensityFill.style.background = '#f0b060';
+  else if (emotion === 'sad')   intensityFill.style.background = '#8ea8d0';
+  else if (emotion === 'loving') intensityFill.style.background = '#f0a0b0';
+  else                          intensityFill.style.background = 'var(--primary)';
+
+  // 动画类切换
+  characterEmoji.classList.remove('happy-anim','sad-anim','surprised-anim');
+  if (data.animClass) characterEmoji.classList.add(data.animClass);
+
+  // 角色区域背景光晕
+  characterArea.className = 'character-area emotion-' + emotion;
+}
+
+// ==================== 语音合成（TTS） ====================
+function speakText(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'zh-CN';
+  utterance.rate = 0.95;
+  utterance.pitch = 1.1;
+
+  const voices = window.speechSynthesis.getVoices();
+  const zhVoice = voices.find(v => v.lang.startsWith('zh-CN') || v.lang.startsWith('zh-TW'));
+  if (zhVoice) utterance.voice = zhVoice;
+
+  isSpeaking = true;
+  utterance.onstart = () => { isSpeaking = true; };
+  utterance.onend   = () => { isSpeaking = false; };
+  utterance.onerror = () => { isSpeaking = false; };
+
+  window.speechSynthesis.speak(utterance);
+}
+
+// ==================== 角色回复消息 ====================
+function botReply(userText) {
+  // 多维情感分析
+  const analysis = analyzeEmotion(userText);
+
+  // 记录情感历史（用于趋势判断）
+  emotionHistory.push({ emotion: analysis.emotion, intensity: analysis.intensity, time: Date.now() });
+  if (emotionHistory.length > 20) emotionHistory.shift();
+
+  // 记录话题历史
+  if (analysis.topic) {
+    topicHistory.push(analysis.topic);
+    if (topicHistory.length > 10) topicHistory.shift();
+  }
+
+  // 推断兴趣标签
+  inferInterestTags(userText);
+
+  // 获取回复
+  const reply = findReply(analysis);
+
+  // 模拟思考延迟
+  setTimeout(() => {
+    setEmotion(analysis.emotion, analysis.intensity);
+    addMessage(reply, 'bot', analysis.emotion);
+    speakText(reply);
+
+    // 情感自然衰减：3秒后恢复到平静状态
+    setTimeout(() => {
+      if (currentEmotion === analysis.emotion && currentEmotion !== 'default') {
+        setEmotion('default', 0.1);
+      }
+    }, 4000);
+  }, 500 + Math.random() * 600);
+}
+
+// ==================== 兴趣标签推断 ====================
+function inferInterestTags(text) {
+  const tagMap = {
+    food:   ['吃','美食','饭','菜','奶茶','咖啡','火锅','烧烤','甜点','零食'],
+    music:  ['歌','音乐','听','唱','旋律','节奏','专辑','歌手'],
+    movie:  ['电影','剧','看','追剧','综艺','纪录片','动画'],
+    travel: ['旅行','旅游','去玩','城市','风景','海边','山','出国'],
+    sports: ['运动','跑步','健身','球','游泳','瑜伽','骑车','锻炼'],
+    work:   ['工作','上班','项目','代码','编程','学习','考试','读书']
+  };
+
+  for (const [tag, keywords] of Object.entries(tagMap)) {
+    if (keywords.some(kw => text.toLowerCase().includes(kw))) {
+      interestTags.add(tag);
+    }
+  }
+
+  // 从话题历史中也提取
+  topicHistory.forEach(t => {
+    if (tagMap[t]) interestTags.add(t);
+  });
+}
+
+// ==================== 智能话题生成 ====================
+function generateSmartTopic() {
+  const now = new Date();
+  const hour = now.getHours();
+  let timeCategory;
+  if (hour >= 6 && hour < 12) timeCategory = 'morning';
+  else if (hour >= 12 && hour < 17) timeCategory = 'afternoon';
+  else if (hour >= 17 && hour < 22) timeCategory = 'evening';
+  else timeCategory = 'night';
+
+  // 优先从用户兴趣标签生成话题
+  const tagArray = Array.from(interestTags);
+  if (tagArray.length > 0 && Math.random() < 0.5) {
+    const tag = tagArray[Math.floor(Math.random() * tagArray.length)];
+    if (smartTopics.interestBased[tag]) {
+      const pool = smartTopics.interestBased[tag];
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+  }
+
+  // 其次使用时间段话题
+  if (Math.random() < 0.4 && smartTopics.timeOfDay[timeCategory]) {
+    const pool = smartTopics.timeOfDay[timeCategory];
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  // 最后使用通用话题
+  return smartTopics.general[Math.floor(Math.random() * smartTopics.general.length)];
+}
+
+// ==================== 发送消息 ====================
+function sendMessage() {
+  const text = messageInput.value.trim();
+  if (!text) return;
+
+  // 记录首条消息时间
+  if (!firstMessageTime) firstMessageTime = new Date();
+
+  addMessage(text, 'user');
+  messageInput.value = '';
+  messageInput.focus();
+
+  botReply(text);
+
+  // 用户响应 → 重置陪伴计数器
+  resetCompanionOnInteraction();
+}
+
+// ==================== 表情面板 ====================
+function toggleEmojiPicker() {
+  emojiPicker.classList.toggle('open');
+  if (emojiPicker.classList.contains('open')) messageInput.focus();
+}
+
+// ==================== 语音识别 ====================
+function toggleVoice() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert('您的浏览器不支持语音识别，请使用 Chrome 或 Edge 浏览器');
+    return;
+  }
+  if (recognition) {
+    recognition.stop();
+    return;
+  }
+  recognition = new SpeechRecognition();
+  recognition.lang = 'zh-CN';
+  recognition.interimResults = true;
+  recognition.continuous = false;
+
+  recognition.onresult = (event) => {
+    let transcript = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      transcript += event.results[i][0].transcript;
+    }
+    messageInput.value = transcript;
+    if (event.results[0].isFinal) {
+      setTimeout(() => {
+        if (messageInput.value.trim()) sendMessage();
+        stopVoiceRecognition();
+      }, 300);
+    }
+  };
+  recognition.onerror = () => stopVoiceRecognition();
+  recognition.onend   = () => stopVoiceRecognition();
+
+  recognition.start();
+  voiceBtn.classList.add('recording');
+  voiceStatus.classList.add('show');
+  voiceBtn.textContent = '⏹';
+}
+
+function stopVoiceRecognition() {
+  if (recognition) { recognition.stop(); recognition = null; }
+  voiceBtn.classList.remove('recording');
+  voiceStatus.classList.remove('show');
+  voiceBtn.textContent = '🎤';
+}
+
+// ==================== 主动陪伴模式（渐进时间） ====================
+// 渐进间隔：30秒 → 1分钟 → 3分钟 → 8分钟
+const companionIntervals = [30000, 60000, 180000, 480000];
+
+function toggleCompanion() {
+  companionActive = !companionActive;
+  if (companionActive) {
+    companionToggle.classList.add('active');
+    companionLabel.textContent = '陪伴中';
+    companionTriggerCount = 0;  // 重置触发计数
+    startCompanionTimer();
+  } else {
+    companionToggle.classList.remove('active');
+    companionLabel.textContent = '主动陪伴';
+    stopCompanionTimer();
+  }
+}
+
+function startCompanionTimer() {
+  stopCompanionTimer();
+  const interval = companionIntervals[Math.min(companionTriggerCount, companionIntervals.length - 1)];
+  inactivityTimer = setTimeout(() => {
+    triggerCompanion();
+  }, interval);
+}
+
+function stopCompanionTimer() {
+  if (inactivityTimer) { clearTimeout(inactivityTimer); inactivityTimer = null; }
+}
+
+/** 用户有交互时调用：重置计数和计时器 */
+function resetCompanionOnInteraction() {
+  companionTriggerCount = 0;
+  stopCompanionTimer();
+  if (companionActive) startCompanionTimer();
+}
+
+/** 触发主动陪伴 */
+function triggerCompanion() {
+  companionTriggerCount++;
+
+  // 第4次触发（8分钟无响应）→ 告别并自动关闭
+  if (companionTriggerCount >= 4) {
+    const goodbyes = [
+      '看来你现在在忙呢～我先暂时离开啦，想我的时候随时叫我哦 👋💜',
+      '你已经好久没理我啦，我先去休息一下，需要的时候我随时回来～ 🌙',
+      '那我先不打扰你啦，想聊天的时候我一直在的，拜拜～ 😊👋'
+    ];
+    const msg = goodbyes[Math.floor(Math.random() * goodbyes.length)];
+    setEmotion('default', 0.1);
+    addMessage(msg, 'bot', 'default');
+    speakText(msg);
+
+    // 自动关闭陪伴模式
+    companionActive = false;
+    companionToggle.classList.remove('active');
+    companionLabel.textContent = '主动陪伴';
+    stopCompanionTimer();
+    return;
+  }
+
+  // 生成智能话题
+  const topic = generateSmartTopic();
+
+  setEmotion('default', 0.15);
+  addMessage(topic, 'bot', 'default');
+  speakText(topic);
+
+  // 继续下一轮计时
+  startCompanionTimer();
+}
+
+// ==================== 戳角色 ====================
+function pokeCharacter() {
+  characterEmoji.classList.remove('poke');
+  void characterEmoji.offsetWidth;
+  characterEmoji.classList.add('poke');
+
+  const pokeReplies = [
+    '哎呀！别戳我啦～😆','嘿嘿，好痒！','戳我干嘛呀～','哈哈哈哈，别闹！'
+  ];
+  const reply = pokeReplies[Math.floor(Math.random() * pokeReplies.length)];
+  addMessage(reply, 'bot', 'happy');
+  setEmotion('happy', 0.6);
+  speakText(reply);
+  setTimeout(() => setEmotion('default', 0.1), 3000);
+
+  resetCompanionOnInteraction();
+}
+
+// ==================== 初始化 ====================
+function init() {
+  initEmojiPicker();
+  // 全局事件监听——重置陪伴计时器
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.character-emoji')) resetCompanionOnInteraction();
+  });
+  document.addEventListener('keydown', () => resetCompanionOnInteraction());
+  scrollToBottom();
+}
+
+init();
+</script>
+</body>
+</html>
