@@ -611,16 +611,18 @@ const dialogueDB = [
     ],
     replies: {
       light:  ['哈哈，是不是很惊喜！😲','生活就是充满各种意外呢～'],
-      medium: ['天哪！这也太厉害了吧！🤩','真是不可思议！快跟我详细说说～']
+      medium: ['天哪！这也太厉害了吧！🤩','真是不可思议！快跟我详细说说～'],
+      strong: ['哇塞！这也太不可思议了吧！我都被惊到了！🤯','简直不敢相信！快告诉我所有细节！']
     },
     emotion: 'surprised'
   },
   {
     topic: 'weather',
-    keywords: [['天气','下雨','晴天','刮风','下雪','热','冷','凉快','温度','阴天','雾霾','台风']],
+    keywords: [['天气','下雨','晴天','刮风','下雪','好热','好冷','太热','太冷','凉快','温度','阴天','雾霾','台风']],
     replies: {
       light:  ['无论什么天气，心里有阳光最重要 ☀️','天气变化记得照顾好自己哦～'],
-      medium: ['下雨天最适合窝着听音乐了，很惬意呢 🎵','换季要注意保暖哦，别感冒了']
+      medium: ['下雨天最适合窝着听音乐了，很惬意呢 🎵','换季要注意保暖哦，别感冒了'],
+      strong: ['恶劣天气一定要注意安全！我们一起等风雨过后的彩虹 🌈','天气再糟糕，有我陪着你，一切都会好起来的']
     },
     emotion: 'default'
   },
@@ -629,7 +631,8 @@ const dialogueDB = [
     keywords: [['饿','吃','美食','外卖','饭','晚餐','午餐','早餐','零食','好吃','奶茶','咖啡','茶','火锅','烧烤']],
     replies: {
       light:  ['好好吃饭才能元气满满！🍚','记得按时吃饭哦～'],
-      medium: ['哇！听起来好好吃！美食真的能治愈人心 🍜','注意营养均衡呀，身体最重要～']
+      medium: ['哇！听起来好好吃！美食真的能治愈人心 🍜','注意营养均衡呀，身体最重要～'],
+      strong: ['美食是生活的小确幸！尽情享受这份美好吧～🥰','好好吃饭是爱自己的第一步，不要委屈了胃哦']
     },
     emotion: 'default'
   },
@@ -638,7 +641,8 @@ const dialogueDB = [
     keywords: [['睡觉','困','晚安','睡','早起','失眠','梦','熬夜','醒了']],
     replies: {
       light:  ['早点休息哦 🌙','晚安～做个甜甜的梦 💤'],
-      medium: ['睡不着的话试试放下手机，闭眼深呼吸，我陪着你','熬夜伤身体呀，快去睡吧～']
+      medium: ['睡不着的话试试放下手机，闭眼深呼吸，我陪着你','熬夜伤身体呀，快去睡吧～'],
+      strong: ['失眠确实很折磨人...但你不是一个人，我陪着你直到睡着 💜','无论多晚，记得照顾好自己，身体最重要']
     },
     emotion: 'default'
   },
@@ -647,7 +651,8 @@ const dialogueDB = [
     keywords: [['谢谢','感谢','感恩','多谢','thx','比心','爱你']],
     replies: {
       light:  ['不用谢～能帮到你就好 💜','嘿嘿，随时都在哦'],
-      medium: ['你愿意跟我说这些，我应该谢谢你呢','能听到你说谢谢，我也很幸福～']
+      medium: ['你愿意跟我说这些，我应该谢谢你呢','能听到你说谢谢，我也很幸福～'],
+      strong: ['你的每一句谢谢都是对我最大的鼓励！我会一直在这里 💖','被你需要的感觉真好，谢谢你愿意让我陪伴你']
     },
     emotion: 'happy'
   },
@@ -656,7 +661,8 @@ const dialogueDB = [
     keywords: [['你好','嗨','hi','hello','在吗','哈喽','早','早上好','下午好','晚上好']],
     replies: {
       light:  ['你好呀！😊','哈喽～'],
-      medium: ['你好呀！今天过得怎么样？😊','看到你真好！有什么新鲜事吗？']
+      medium: ['你好呀！今天过得怎么样？😊','看到你真好！有什么新鲜事吗？'],
+      strong: ['哇！好久不见！看到你真的太开心了！🎉','每次见到你心情都会变好，有你真好～']
     },
     emotion: 'happy'
   },
@@ -665,7 +671,8 @@ const dialogueDB = [
     keywords: [['爱','喜欢','想你','想我','表白','恋爱','男朋友','女朋友','对象','分手','暗恋']],
     replies: {
       light:  ['被爱和爱人都是很美好的事呢 💕','感情需要两个人一起用心经营哦'],
-      medium: ['无论发生什么，都要先好好爱自己 💜','真正的关系是彼此滋养的，祝你幸福']
+      medium: ['无论发生什么，都要先好好爱自己 💜','真正的关系是彼此滋养的，祝你幸福'],
+      strong: ['爱是世界上最美好的事情～勇敢去爱吧！💖','无论结局如何，爱本身就是值得的，你很棒！']
     },
     emotion: 'loving'
   },
@@ -674,7 +681,8 @@ const dialogueDB = [
     keywords: [['工作','上班','加班','老板','同事','离职','面试','工资','项目','代码','bug','程序']],
     replies: {
       light:  ['工作辛苦了！记得活动一下 💪','注意劳逸结合哦～'],
-      medium: ['遇到困难别灰心，你已经很棒了！工作和生活要平衡','每个认真工作的人都值得被好好对待']
+      medium: ['遇到困难别灰心，你已经很棒了！工作和生活要平衡','每个认真工作的人都值得被好好对待'],
+      strong: ['工作再难也要记得照顾自己！你已经做得很好了，不要苛责自己 🫂','无论工作多辛苦，你都是独一无二的，休息一下再出发吧']
     },
     emotion: 'default'
   },
@@ -683,7 +691,8 @@ const dialogueDB = [
     keywords: [['无聊','没意思','干嘛','做什么','好闲','不知道干什么']],
     replies: {
       light:  ['那一起找点乐子吧！','无聊的时候最适合听歌啦 🎬'],
-      medium: ['要不要我给你推荐一部电影？或者聊聊你最近感兴趣的事？']
+      medium: ['要不要我给你推荐一部电影？或者聊聊你最近感兴趣的事？'],
+      strong: ['无聊也是一种难得的留白时间，我们可以一起发呆、聊天，或者做点什么有趣的事～','让我来陪你度过这段时光吧！我们可以聊任何你想聊的话题']
     },
     emotion: 'default'
   },
@@ -691,16 +700,19 @@ const dialogueDB = [
     topic: 'festival',
     keywords: [['生日','节日','圣诞','新年','春节','中秋','端午','国庆']],
     replies: {
-      light:  ['节日快乐呀！🎉','特别的日子，愿你被幸福包围～']
+      light:  ['节日快乐呀！🎉','特别的日子，愿你被幸福包围～'],
+      medium: ['今天是个特别的日子！一定要好好享受哦～🎊','愿这个节日带给你满满的幸福和快乐！'],
+      strong: ['哇！这么重要的日子！祝你生日快乐/节日快乐！愿你每一天都像今天一样幸福！🎂🎉','特别的日子里，愿所有美好的事情都发生在你身上！爱你哦～']
     },
     emotion: 'happy'
   },
   {
     topic: 'sick',
-    keywords: [['生病','不舒服','头疼','肚子疼','感冒','咳嗽','发烧','难受']],
+    keywords: [['生病','不舒服','头疼','肚子疼','感冒','咳嗽','发烧','喉咙痛','流鼻涕','头晕']],
     replies: {
       light:  ['好好休息，别硬撑 🥺','多喝热水，注意保暖'],
-      medium: ['生病的时候最需要人关心了，记得吃药，我陪着你','身体是革命的本钱，快快好起来！']
+      medium: ['生病的时候最需要人关心了，记得吃药，我陪着你','身体是革命的本钱，快快好起来！'],
+      strong: ['生病真的很不容易...我一直在你身边，陪你一起度过这个难关 🫂','照顾好自己最重要，不要着急，慢慢来，我陪你直到康复']
     },
     emotion: 'sad'
   },
@@ -708,13 +720,43 @@ const dialogueDB = [
     topic: 'anger',
     keywords: [
       ['生气','火大','讨厌','烦死了'],
-      ['气死','怒了','受够了','无语']
+      ['气死','怒了','受够了','无语'],
+      ['暴怒','恨','忍无可忍','抓狂']
     ],
     replies: {
       light:  ['消消气～深呼吸，不值得 😤','理解你的感受，先冷静一下'],
-      medium: ['气坏了身体可不好！把烦心事说出来会好受些','我在这里听你吐槽，尽情发泄吧']
+      medium: ['气坏了身体可不好！把烦心事说出来会好受些','我在这里听你吐槽，尽情发泄吧'],
+      strong: ['我知道你现在非常生气，但请相信，一切都会过去的。我在这里陪着你，慢慢冷静下来 🫂','愤怒是正常的情绪，你不需要压抑它。但也要记得，爱自己比什么都重要']
     },
-    emotion: 'sad'
+    emotion: { light: 'default', medium: 'sad', strong: 'sad' }
+  },
+  {
+    topic: 'study',
+    keywords: [
+      ['学习','复习','看书','考试','作业','上课','课堂','笔记','预习'],
+      ['挂科','考砸','复习不完','压力大','好难','太难','不会','听不懂'],
+      ['不想学了','学不进去','放弃','退学']
+    ],
+    replies: {
+      light:  ['学习是一件需要耐心的事，慢慢来～ 📚','劳逸结合，效率更高哦'],
+      medium: ['考试压力大很正常，深呼吸，你一定可以的 💪','学不进去的时候，先休息一下再回来'],
+      strong: ['别放弃！每个人都有低谷期，坚持下去就会看到光 🫂','学不进去不是你的错，试着找到适合自己的学习方式']
+    },
+    emotion: { light: 'default', medium: 'sad', strong: 'sad' }
+  },
+  {
+    topic: 'pet',
+    keywords: [
+      ['猫','狗','宠物','喵','汪','撸猫','遛狗','可爱','毛茸茸','萌'],
+      ['主子','铲屎官','猫粮','狗粮','宠物用品','宠物店'],
+      ['领养','救助','猫咪','狗狗','宠物医院']
+    ],
+    replies: {
+      light:  ['哇！可爱的小毛球～🐱','宠物真的很治愈呢～'],
+      medium: ['撸猫是世界上最幸福的事吧！😻','毛茸茸的小家伙们总能让人心情变好'],
+      strong: ['有宠物陪伴真的很幸福！它们是最好的家人 🐾','小动物们的爱最纯粹了，好好珍惜哦～']
+    },
+    emotion: 'happy'
   }
 ];
 
@@ -741,7 +783,7 @@ const emotionMap = {
   'happy':     { emojis: ['😊','😄','🤩'], mood: '心情：开心', animClass: 'happy-anim' },
   'sad':       { emojis: ['😔','😢','😭'], mood: '心情：难过', animClass: 'sad-anim' },
   'surprised': { emojis: ['😮','😲','😱'], mood: '心情：惊讶', animClass: 'surprised-anim' },
-  'loving':    { emojis: ['😊','🥰','😍'], mood: '心情：温暖', animClass: 'happy-anim' }
+  'loving':    { emojis: ['😊','🥰','😍','💖'], mood: '心情：温暖', animClass: 'happy-anim' }
 };
 
 // ==================== 智能话题库（主动陪伴时使用） ====================
@@ -760,8 +802,24 @@ const smartTopics = {
     movie:  ['最近看了什么好看的电影吗？','喜欢什么类型的影视剧？'],
     work:   ['最近工作/学习上有什么新进展吗？','有没有遇到什么有趣的项目？'],
     travel: ['有没有想去旅行的地方？','你最喜欢的城市是哪里？'],
-    sports: ['平时喜欢做什么运动？','最近有在锻炼吗？']
+    sports: ['平时喜欢做什么运动？','最近有在锻炼吗？'],
+    study:  ['最近学习上有什么收获吗？','考试准备得怎么样了？','有没有什么学习方法想分享？'],
+    pet:    ['你家宠物叫什么名字呀？','平时喜欢跟宠物玩什么？','有没有宠物的可爱照片？']
   },
+  concern: [
+    '感觉你最近心情不太好...有什么我可以帮到你的吗？🫂',
+    '无论发生什么，我都会在这里陪着你。累了就休息一下吧～',
+    '有时候倾诉出来会好受很多，我一直在听哦 💜',
+    '你已经很努力了，不要太苛责自己。抱抱你～',
+    '困难总会过去的，我相信你一定可以的！加油！'
+  ],
+  celebrate: [
+    '看到你这么开心，我也好开心呀！🎉',
+    '你的快乐真的很有感染力！继续保持哦～',
+    '太棒了！这么开心的事情值得好好庆祝一下！',
+    '愿你每天都能像现在这样快乐！🌟',
+    '有什么开心的事可以跟我分享吗？我也想一起开心！'
+  ],
   // 通用开放话题
   general: [
     '你知道吗？有时候什么都不做也是一种充电 🔋',
@@ -1105,6 +1163,17 @@ function analyzeEmotion(text) {
   let bestIntensity = 0;          // 0=light, 1=medium, 2=strong
   let matchedKeywords = [];
   let matchedTopic = null;
+  let matchCount = 0;
+
+  // 情绪优先级：多匹配时优先选择负面/重要情绪
+  const emotionPriority = {
+    'sad': 5,
+    'loving': 4,
+    'surprised': 3,
+    'happy': 2,
+    'default': 1
+  };
+  const levelToKey = ['light', 'medium', 'strong'];
 
   for (const entry of dialogueDB) {
     let score = 0;
@@ -1122,16 +1191,43 @@ function analyzeEmotion(text) {
       });
       if (levelMatchCount > 0) {
         score += weight * levelMatchCount;
+        matchCount += levelMatchCount;
         if (levelIdx > maxLevel) maxLevel = levelIdx;
       }
     });
 
+    // 匹配数量奖励分
+    score += matchCount * 2;
+
+    // 按强度分档解析 emotion
+    let resolvedEmotion;
+    if (typeof entry.emotion === 'object') {
+      const levelKey = levelToKey[maxLevel] || 'light';
+      resolvedEmotion = entry.emotion[levelKey] || 'default';
+    } else {
+      resolvedEmotion = entry.emotion;
+    }
+
+    const currentPriority = emotionPriority[resolvedEmotion] || 1;
+    const bestPriority = emotionPriority[bestEmotion] || 1;
+
     if (score > bestScore) {
       bestScore = score;
-      bestEmotion = entry.emotion;
+      bestEmotion = resolvedEmotion;
       bestTopic = entry.topic;
       bestIntensity = maxLevel;  // 0=light, 1=medium, 2=strong
       matchedTopic = entry;
+    } else if (score === bestScore) {
+      if (maxLevel > bestIntensity) {
+        bestIntensity = maxLevel;
+        bestEmotion = resolvedEmotion;
+        bestTopic = entry.topic;
+        matchedTopic = entry;
+      } else if (maxLevel === bestIntensity && currentPriority > bestPriority) {
+        bestEmotion = resolvedEmotion;
+        bestTopic = entry.topic;
+        matchedTopic = entry;
+      }
     }
   }
 
@@ -1321,7 +1417,9 @@ function inferInterestTags(text) {
     movie:  ['电影','剧','看','追剧','综艺','纪录片','动画'],
     travel: ['旅行','旅游','去玩','城市','风景','海边','山','出国'],
     sports: ['运动','跑步','健身','球','游泳','瑜伽','骑车','锻炼'],
-    work:   ['工作','上班','项目','代码','编程','学习','考试','读书']
+    work:   ['工作','上班','项目','代码','编程'],
+    study:  ['学习','考试','作业','上课','复习','看书','笔记','预习','挂科'],
+    pet:    ['猫','狗','宠物','喵','汪','撸猫','遛狗','主子','铲屎官']
   };
 
   for (const [tag, keywords] of Object.entries(tagMap)) {
@@ -1336,6 +1434,16 @@ function inferInterestTags(text) {
   });
 }
 
+// ==================== 情感趋势检测 ====================
+function detectEmotionTrend() {
+  const recentEmotions = emotionHistory.slice(-5);
+  const sadCount = recentEmotions.filter(e => e.emotion === 'sad' && e.intensity >= 0.4).length;
+  const happyCount = recentEmotions.filter(e => e.emotion === 'happy' && e.intensity >= 0.4).length;
+  if (sadCount >= 3) return 'continuous_sad';
+  if (happyCount >= 3) return 'continuous_happy';
+  return 'normal';
+}
+
 // ==================== 智能话题生成 ====================
 function generateSmartTopic() {
   const now = new Date();
@@ -1345,6 +1453,15 @@ function generateSmartTopic() {
   else if (hour >= 12 && hour < 17) timeCategory = 'afternoon';
   else if (hour >= 17 && hour < 22) timeCategory = 'evening';
   else timeCategory = 'night';
+
+  // 情感趋势检测：连续负面情绪时优先发送关心消息
+  const trend = detectEmotionTrend();
+  if (trend === 'continuous_sad' && Math.random() < 0.6) {
+    return smartTopics.concern[Math.floor(Math.random() * smartTopics.concern.length)];
+  }
+  if (trend === 'continuous_happy' && Math.random() < 0.4) {
+    return smartTopics.celebrate[Math.floor(Math.random() * smartTopics.celebrate.length)];
+  }
 
   // 优先从用户兴趣标签生成话题
   const tagArray = Array.from(interestTags);
@@ -1499,8 +1616,20 @@ function triggerCompanion() {
   // 生成智能话题
   const topic = generateSmartTopic();
 
-  setEmotion('default', 0.15);
-  addMessage(topic, 'bot', 'default');
+  // 根据情感趋势选择表情
+  const trend = detectEmotionTrend();
+  let companionEmotion = 'default';
+  let companionIntensity = 0.15;
+  if (trend === 'continuous_sad') {
+    companionEmotion = 'loving';
+    companionIntensity = 0.4;
+  } else if (trend === 'continuous_happy') {
+    companionEmotion = 'happy';
+    companionIntensity = 0.3;
+  }
+
+  setEmotion(companionEmotion, companionIntensity);
+  addMessage(topic, 'bot', companionEmotion);
   speakText(topic);
 
   // 继续下一轮计时

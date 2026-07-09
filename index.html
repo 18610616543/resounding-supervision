@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>resounding-supervision · 控制台</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- ====== 侧边栏 ====== -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">&#9829;</div>
+      <div class="brand-text">resounding-supervision</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" data-page="console">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+        <span>控制台</span>
+      </div>
+      <div class="nav-item" data-page="share">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        <span>分享码</span>
+      </div>
+      <div class="nav-item" data-page="settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <span>系统设置</span>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div id="sidebarUser" class="sidebar-user" style="display:none">
+        <div id="sidebarAvatar" class="avatar"></div>
+        <span id="sidebarUsername"></span>
+      </div>
+      <button id="sidebarLogin" class="btn btn-sm btn-outline" onclick="App.showAuth()">登录</button>
+      <button id="sidebarLogout" class="btn btn-sm btn-ghost" style="display:none" onclick="App.logout()">退出</button>
+    </div>
+  </aside>
+
+  <!-- ====== 主内容区 ====== -->
+  <main class="main-content">
+    <header class="main-header">
+      <h1 id="pageTitle">控制台</h1>
+      <button class="btn btn-primary" onclick="App.openConfigPanel()">+ 创建智能体</button>
+    </header>
+
+    <!-- 控制台页面 -->
+    <section id="page-console" class="page active">
+      <div id="agentGrid" class="agent-grid"></div>
+    </section>
+
+    <!-- 分享码页面 -->
+    <section id="page-share" class="page">
+      <div class="share-section">
+        <h3>导入分享码</h3>
+        <div class="share-input-row">
+          <input id="shareCodeInput" type="text" placeholder="粘贴分享码（如 67R1iMmKQN）" class="input">
+          <button class="btn btn-primary" onclick="App.importShareCode()">导入</button>
+        </div>
+        <p id="shareImportMsg" style="margin-top:8px;font-size:0.85rem;min-height:20px;"></p>
+      </div>
+      <div class="share-section">
+        <h3>已生成分享码</h3>
+        <div id="shareList"></div>
+      </div>
+      <div class="share-section">
+        <h3>社区推荐</h3>
+        <div id="communityGrid" class="community-grid"></div>
+      </div>
+    </section>
+
+    <!-- 系统设置页面 -->
+    <section id="page-settings" class="page">
+      <div class="settings-section">
+        <h3>全局设置</h3>
+        <div class="form-group">
+          <label>默认智能体名称</label>
+          <input id="gblName" type="text" class="input" placeholder="默认角色名">
+        </div>
+        <div class="form-group">
+          <label>全局唤醒词（只读）</label>
+          <input id="gblWakeWord" type="text" class="input" readonly disabled>
+        </div>
+        <button class="btn btn-primary" onclick="App.saveGlobalSettings()">保存全局设置</button>
+      </div>
+      <div class="settings-section">
+        <h3>智能体列表</h3>
+        <div id="settingsAgentList"></div>
+      </div>
+      <div class="settings-section">
+        <h3>数据管理</h3>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-outline" onclick="App.exportData()">导出数据 (JSON)</button>
+          <button class="btn btn-outline" onclick="document.getElementById('importFileInput').click()">导入数据 (JSON)</button>
+          <input id="importFileInput" type="file" accept=".json" style="display:none" onchange="App.importData(event)">
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ====== 智能体配置面板 ====== -->
+  <div id="configOverlay" class="modal-overlay" style="display:none">
+    <div class="config-panel">
+      <div class="config-panel-header">
+        <h2 id="configPanelTitle">创建智能体</h2>
+        <button class="btn-close" onclick="App._confirmClosePanel()">&times;</button>
+      </div>
+      <div class="config-panel-body">
+        <!-- 基本信息 -->
+        <div class="form-group">
+          <label>智能体名称</label>
+          <input id="cfgAgentName" type="text" class="input" placeholder="给角色起个名字" maxlength="20">
+          <input type="hidden" id="cfgAgentId">
+        </div>
+        <div class="form-group">
+          <label>唤醒词（全局只读）</label>
+          <input id="cfgWakeWord" type="text" class="input" readonly disabled>
+        </div>
+        <!-- 性别切换 -->
+        <div class="form-group">
+          <label>性别</label>
+          <input type="hidden" id="cfgGender" value="female">
+          <div id="genderToggle" class="toggle-group">
+            <button class="gender-btn active" data-gender="female" onclick="App.setGender('female')">&#9792; 女性</button>
+            <button class="gender-btn" data-gender="male" onclick="App.setGender('male')">&#9794; 男性</button>
+          </div>
+        </div>
+        <!-- 语言/方言 -->
+        <div class="form-group">
+          <label>语言 / 方言</label>
+          <select id="cfgLanguage" class="input" onchange="App._onLangChange()"></select>
+        </div>
+        <!-- 语音 -->
+        <div class="form-group">
+          <label>语音角色</label>
+          <select id="cfgVoice" class="input"></select>
+        </div>
+        <!-- 模型选择 -->
+        <div class="form-group">
+          <label>大模型</label>
+          <select id="cfgModel" class="input">
+            <option value="qwen">通义千问 (Qwen)</option>
+            <option value="deepseek">DeepSeek</option>
+            <option value="gpt">GPT-4o</option>
+          </select>
+        </div>
+        <!-- 人格配置 -->
+        <div class="form-group">
+          <label>人格配置模式</label>
+          <input type="hidden" id="cfgBranch" value="preset">
+          <div class="toggle-group">
+            <button class="persona-tab active" data-branch="preset" onclick="App._switchBranchUI('preset')">预设人格</button>
+            <button class="persona-tab" data-branch="custom" onclick="App._switchBranchUI('custom')">自定义提示词</button>
+          </div>
+        </div>
+        <!-- 预设人格分支 -->
+        <div id="branchPreset" class="persona-branch active">
+          <input type="hidden" id="cfgPresets">
+          <div id="presetGrid" class="preset-grid"></div>
+          <!-- 预设详情预览 -->
+          <div id="presetPreview" class="preset-preview" style="display:none">
+            <div class="preset-preview-header">
+              <h4 id="presetDetailName"></h4>
+              <button class="btn-close" onclick="App.hidePresetDetail()">&times;</button>
+            </div>
+            <p id="presetDetailDesc"></p>
+            <div id="presetDetailChats" class="preset-detail-chats"></div>
+          </div>
+        </div>
+        <!-- 自定义提示词分支 -->
+        <div id="branchCustom" class="persona-branch">
+          <div class="form-group">
+            <label>系统提示词</label>
+            <textarea id="cfgPrompt" class="input" rows="6" placeholder="描述你希望 AI 扮演的角色...&#10;可用 {{assistant_name}} 作为角色名占位符"></textarea>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+              <div class="char-counter"><span id="cfgCharCount">0</span> / 2500</div>
+              <button class="btn btn-sm btn-outline" onclick="App._polish()">&#10022; AI 润色</button>
+            </div>
+          </div>
+          <!-- 润色面板 -->
+          <div id="polishPanel" class="polish-panel" style="display:none">
+            <div id="polishBody"></div>
+          </div>
+          <!-- 预览 -->
+          <div class="form-group">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+              <input type="checkbox" id="cfgPreviewToggle" checked> 实时预览
+            </label>
+            <div id="configPreviewBody" class="config-preview-body"></div>
+          </div>
+        </div>
+      </div>
+      <div class="config-panel-footer">
+        <button class="btn btn-outline" onclick="App._confirmClosePanel()">取消</button>
+        <button class="btn btn-primary" id="saveConfigBtn" onclick="App.saveConfig()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== 登录/注册弹窗 ====== -->
+  <div id="authModal" class="modal-overlay" style="display:none">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="auth-tabs">
+          <button class="auth-tab active" data-tab="login">登录</button>
+          <button class="auth-tab" data-tab="register">注册</button>
+        </div>
+        <button class="btn-close" onclick="App.closeAuth()">&times;</button>
+      </div>
+      <!-- 登录表单 -->
+      <form id="loginForm" class="auth-form active">
+        <div id="loginFormError" class="form-error"></div>
+        <div class="form-group">
+          <label>邮箱 / 用户名</label>
+          <input id="loginEmail" type="text" class="input" placeholder="demo@echocare.ai">
+          <span id="loginEmailError" class="field-error"></span>
+        </div>
+        <div class="form-group">
+          <label>密码</label>
+          <div class="input-with-icon">
+            <input id="loginPassword" type="password" class="input" placeholder="echocare2024">
+            <button type="button" id="togglePwd" class="icon-btn">
+              <span id="eyeOn">&#128065;</span><span id="eyeOff" style="display:none">&#128064;</span>
+            </button>
+          </div>
+          <span id="loginPasswordError" class="field-error"></span>
+        </div>
+        <div class="form-row">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+            <input type="checkbox" id="rememberMe"> 记住密码
+          </label>
+          <a href="javascript:App.showForgotPwd()" class="link">忘记密码？</a>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="loginBtn">登录</button>
+        <p style="text-align:center;margin-top:12px;font-size:0.8rem;color:var(--text-muted);">
+          演示账号：demo@echocare.ai / echocare2024
+        </p>
+      </form>
+      <!-- 注册表单 -->
+      <form id="registerForm" class="auth-form">
+        <div id="registerFormError" class="form-error"></div>
+        <div class="form-group">
+          <label>用户名</label>
+          <input id="regUsername" type="text" class="input" placeholder="至少2个字符">
+          <span id="regUsernameError" class="field-error"></span>
+        </div>
+        <div class="form-group">
+          <label>邮箱</label>
+          <input id="regEmail" type="email" class="input" placeholder="your@email.com">
+          <span id="regEmailError" class="field-error"></span>
+        </div>
+        <div class="form-group">
+          <label>密码</label>
+          <input id="regPassword" type="password" class="input" placeholder="至少6位">
+          <span id="regPasswordError" class="field-error"></span>
+        </div>
+        <div class="form-group">
+          <label>确认密码</label>
+          <input id="regConfirm" type="password" class="input" placeholder="再次输入密码">
+          <span id="regConfirmError" class="field-error"></span>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="registerBtn">注册</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====== 忘记密码弹窗 ====== -->
+  <div id="forgotModal" class="modal-overlay" style="display:none">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>找回密码</h3>
+        <button class="btn-close" onclick="App.closeForgotPwd()">&times;</button>
+      </div>
+      <div id="forgotFormError" class="form-error"></div>
+      <div class="form-group">
+        <label>注册邮箱</label>
+        <input id="forgotEmail" type="email" class="input" placeholder="输入注册时使用的邮箱">
+        <span id="forgotEmailError" class="field-error"></span>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="App._doForgotPwd()">发送重置链接</button>
+    </div>
+  </div>
+
+  <!-- ====== 二次确认弹窗 ====== -->
+  <div id="confirmModal" class="modal-overlay" style="display:none">
+    <div class="modal modal-sm">
+      <p id="confirmMsg" style="margin-bottom:16px;"></p>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button class="btn btn-outline" onclick="App.dismissConfirm()">取消</button>
+        <button class="btn btn-danger" onclick="App.execConfirm()">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== Toast 通知 ====== -->
+  <div id="toast"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

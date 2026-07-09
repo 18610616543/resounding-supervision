@@ -1077,7 +1077,7 @@ const App = {
     });
   },
 
-  // ====== 二次确��机制 ======
+  // ====== 二次确认机制 ======
   _confirm(msg, callback) {
     $('#confirmMsg').textContent = msg;
     this._confirmCallback = callback;
