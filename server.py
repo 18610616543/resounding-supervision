@@ -7,7 +7,7 @@ import urllib.request
 import urllib.error
 import os
 
-PORT = 3000
+PORT = int(os.environ.get('PORT', 3000))
 POLLINATIONS_URL = 'https://text.pollinations.ai/openai'
 
 class ProxyHandler(http.server.SimpleHTTPRequestHandler):
@@ -71,10 +71,10 @@ class ProxyHandler(http.server.SimpleHTTPRequestHandler):
 if __name__ == '__main__':
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     server = http.server.HTTPServer(('0.0.0.0', PORT), ProxyHandler)
-    print(f'✅ 服务器启动: http://localhost:{PORT}')
-    print(f'🤖 AI 代理: POST http://localhost:{PORT}/api/chat → {POLLINATIONS_URL}')
+    print(f'Server running on port {PORT}')
+    print(f'AI proxy: POST /api/chat -> {POLLINATIONS_URL}')
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        print('\n👋 服务器已停止')
+        print('\nServer stopped')
         server.server_close()
