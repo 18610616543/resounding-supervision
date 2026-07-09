@@ -882,11 +882,11 @@ async function callAI(userMessage) {
     };
     model = apiConfig.model;
   } else {
-    // 免费模式：通过本地代理转发到 Pollinations.ai（无需 Key，无需注册）
-    endpoint = '/api/chat';
+    // 免费模式：直接调用 Pollinations.ai（支持 CORS，无需代理）
+    endpoint = 'https://text.pollinations.ai/openai';
     headers = { 'Content-Type': 'application/json' };
     model = 'openai';
-    console.log('🔵 [API] 使用免费 AI（通过本地代理转发）');
+    console.log('🔵 [API] 使用免费 AI（直连 Pollinations.ai）');
   }
 
   console.log('🔄 [API] 正在请求... 端点:', endpoint, '模型:', model);
