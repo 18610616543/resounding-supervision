@@ -1,5 +1,5 @@
 /**
- * resounding-supervision · 控制台 — 前端应用 v2
+ * EchoCare · 控制台 — 前端应用 v2
  * ==========================================================
  * 功能：智能体管理 / 性别语音联动 / 预设+自定人格双分支
  *       AI润色 / 二次确认 / 实时预览 / 分享码
@@ -248,7 +248,7 @@ function buildPresetPrompt(presetIds, gender, agentName) {
 
 // ======================== 存储层 ========================
 const Storage = {
-  _key(k) { return 'resounding-supervision_' + k; },
+  _key(k) { return 'echocare_' + k; },
   get(k, fb = null) { try { const v = localStorage.getItem(this._key(k)); return v ? JSON.parse(v) : fb; } catch { return fb; } },
   set(k, v) { localStorage.setItem(this._key(k), JSON.stringify(v)); },
   remove(k) { localStorage.removeItem(this._key(k)); }
@@ -272,10 +272,10 @@ const Auth = {
   _init() {
     if (!this._users) {
       this._users = Storage.get('users', {});
-      if (!this._users['demo@resounding-supervision.ai']) {
-        this._users['demo@resounding-supervision.ai'] = {
-          username: 'demo', email: 'demo@resounding-supervision.ai',
-          password: this._h('resounding-supervision2024'), createdAt: Date.now()
+      if (!this._users['demo@echocare.ai']) {
+        this._users['demo@echocare.ai'] = {
+          username: 'demo', email: 'demo@echocare.ai',
+          password: this._h('echocare2024'), createdAt: Date.now()
         };
         this._save();
       }
@@ -463,7 +463,7 @@ const App = {
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `resounding-supervision-backup-${new Date().toISOString().slice(0,10)}.json`;
+    a.href = url; a.download = `echocare-backup-${new Date().toISOString().slice(0,10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
     Toast.show('备份已下载', 'success');
@@ -1098,15 +1098,36 @@ const App = {
   shareCurrentConfig() {
     const name = $('#cfgAgentName').value.trim();
     if (!name) { Toast.show('请先填写智能体名称', 'error'); return; }
+    const gender = $('#cfgGender').value;
+    const presets = [...this.selectedPresets];
     const agent = {
-        name, gender: $('#cfgGender').value, language: $('#cfgLanguage').value,
+        name, gender, language: $('#cfgLanguage').value,
         voice: $('#cfgVoice').value, model: $('#cfgModel').value,
         branch: $('#cfgBranch').value, prompt: $('#cfgPrompt').value,
-        presets: [...this.selectedPresets]
+        presets
       };
-    const code = this._generateShareCode(agent);
     const shareList = Storage.get('shares', []);
-    shareList.unshift({ code, name, createdAt: Date.now() });
+    // 去重：按 name + gender 匹配同一智能体
+    const existing = shareList.find(s => s.name === name && s._gender === gender);
+    if (existing) {
+      // 配置未变 → 不重复生成
+      if (JSON.stringify(s._presets) === JSON.stringify(presets)) {
+        navigator.clipboard?.writeText(existing.code);
+        Toast.show(`分享码已存在：${existing.code}`, 'info', 3000);
+        return;
+      }
+      // 配置已更新 → 刷新分享码
+      existing.code = this._generateShareCode(agent);
+      existing._presets = presets;
+      existing.createdAt = Date.now();
+      Storage.set('shares', shareList);
+      navigator.clipboard?.writeText(existing.code);
+      Toast.show(`配置已更新，新分享码：${existing.code}`, 'success', 4000);
+      this._renderShares();
+      return;
+    }
+    const code = this._generateShareCode(agent);
+    shareList.unshift({ code, name, createdAt: Date.now(), _gender: gender, _presets: presets });
     Storage.set('shares', shareList.slice(0, 20));
     navigator.clipboard?.writeText(code);
     Toast.show(`分享码已生成并复制：${code}`, 'success', 4000);
@@ -1116,14 +1137,39 @@ const App = {
   importShareCode() {
     const code = $('#shareCodeInput').value.trim();
     $('#shareError').textContent = '';
+    // 空码
     if (!code) { $('#shareError').textContent = '请输入分享码'; return; }
+    // 格式校验：长度不足
+    if (code.length < 4) { $('#shareError').textContent = '分享码格式不正确，请检查'; return; }
     const shares = Storage.get('shares', []);
     let found = shares.find(s => s.code === code);
-    if (!found) { const community = this._getCommunityCodes(); found = community.find(c => c.code === code); }
-    if (!found) { $('#shareError').textContent = '未找到该分享码'; return; }
+    let isCommunity = false;
+    if (!found) { const community = this._getCommunityCodes(); found = community.find(c => c.code === code); isCommunity = !!found; }
+    if (!found) { $('#shareError').textContent = '未找到该分享码，请确认码是否正确'; return; }
     let agentData = null;
-    try { agentData = JSON.parse(decodeURIComponent(atob(found.raw || found.code))); } catch { agentData = { n: found.name, p: found.prompt || '' }; }
+    if (isCommunity) {
+      // 社区码：直接使用预设数据
+      agentData = { n: found.name, p: found.prompt || '' };
+    } else {
+      // 用户分享码：尝试解码（有 raw 字段才能完整解码）
+      if (found.raw) {
+        try { agentData = JSON.parse(decodeURIComponent(atob(found.raw))); } catch {
+          $('#shareError').textContent = '分享码已损坏，无法解析';
+          return;
+        }
+      } else {
+        // 无 raw 字段，使用分享记录中存储的字段
+        agentData = { n: found.name, g: found._gender, ps: found._presets };
+      }
+    }
     const name = agentData.n || found.name || '导入';
+    // 重复导入检查
+    const dupAgent = this.agents.find(a => a.name === name);
+    if (dupAgent) {
+      $('#shareError').textContent = '该配置已存在';
+      Toast.show(`"${name}" 已存在，无需重复导入`, 'info');
+      return;
+    }
     this.showConfigPanel(null);
     $('#cfgAgentName').value = name;
     const gender = agentData.g || 'female';
