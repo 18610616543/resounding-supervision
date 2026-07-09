@@ -174,6 +174,79 @@
     }
     .settings-modal .status-text.error { color: #e85d5d; }
 
+    /* ========== 设置弹窗 - Tab 切换 ========== */
+    .settings-tabs {
+      display: flex; gap: 2px;
+      background: #f0edf5; border-radius: 10px;
+      padding: 3px; margin-bottom: 16px;
+    }
+    .settings-tab-btn {
+      flex: 1; padding: 8px 0; border: none;
+      background: transparent; border-radius: 8px;
+      font-size: 0.85rem; font-weight: 500;
+      cursor: pointer; color: var(--text-light);
+      transition: all 0.2s;
+    }
+    .settings-tab-btn.active {
+      background: var(--white); color: var(--primary);
+      font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .settings-tab-content { display: none; }
+    .settings-tab-content.active { display: block; }
+
+    /* ========== 人格面板 ========== */
+    .personality-grid-mini {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 6px; margin-bottom: 14px;
+      max-height: 240px; overflow-y: auto;
+    }
+    .pcard-mini {
+      border: 1.5px solid #e5e0db; border-radius: 10px;
+      padding: 8px 6px; cursor: pointer; transition: all 0.2s;
+      text-align: center;
+    }
+    .pcard-mini:hover { border-color: #b0a0d0; background: #fdfcff; }
+    .pcard-mini.active { border-color: var(--primary); background: #f6f3fc; box-shadow: 0 0 0 2px rgba(124,111,160,0.12); }
+    .pcard-mini .em{ font-size: 1.3rem; }
+    .pcard-mini .nm{ font-weight: 700; font-size: 0.82rem; margin: 2px 0; }
+    .pcard-mini .ds{ font-size: 0.65rem; color: var(--text-light); line-height: 1.2; }
+
+    .style-row { margin-bottom: 10px; }
+    .style-row .sl{ font-size: 0.78rem; font-weight: 600; margin-bottom: 4px; color: var(--text); }
+    .style-opts { display: flex; gap: 4px; }
+    .style-opt {
+      flex: 1; padding: 5px 4px; border: 1.5px solid #e5e0db;
+      border-radius: 7px; text-align: center; cursor: pointer;
+      font-size: 0.72rem; transition: all 0.15s; background: #fafaf8;
+    }
+    .style-opt:hover { border-color: #b0a0d0; }
+    .style-opt.active { border-color: var(--primary); background: #f6f3fc; color: #5b3e8c; font-weight: 600; }
+
+    .conf-save-row { display: flex; gap: 6px; margin-top: 12px; }
+    .conf-save-row input { flex: 1; padding: 6px 10px; border: 1.5px solid #e5e0db; border-radius: 8px; font-size: 0.8rem; outline: none; }
+    .conf-save-row input:focus { border-color: var(--primary); }
+    .conf-save-row button {
+      padding: 6px 14px; border: none; border-radius: 8px;
+      background: var(--primary); color: #fff; font-size: 0.8rem; font-weight: 600; cursor: pointer;
+    }
+    .conf-save-row button:hover { background: #6a5e8a; }
+
+    .conf-list-mini { margin-top: 10px; max-height: 150px; overflow-y: auto; }
+    .conf-item-mini {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 10px; border: 1px solid #e5e0db; border-radius: 8px;
+      margin-bottom: 4px; cursor: pointer; font-size: 0.78rem; transition: all 0.15s;
+    }
+    .conf-item-mini:hover { border-color: #b0a0d0; }
+    .conf-item-mini.active { border-color: var(--primary); background: #fdfaff; }
+    .conf-item-mini .del { color: #ccc; cursor: pointer; font-size: 0.85rem; }
+    .conf-item-mini .del:hover { color: #e85d5d; }
+
+    .p-warn {
+      background: #fef9e7; border: 1px solid #f9e79f; border-radius: 8px;
+      padding: 6px 10px; font-size: 0.72rem; color: #7d6608; margin-top: 8px;
+    }
+
     /* API 调用中加载动画 */
     .typing-indicator {
       display: flex; align-items: center; gap: 4px;
@@ -530,7 +603,14 @@
 <!-- ========== 设置弹窗 ========== -->
 <div class="settings-overlay" id="settingsOverlay" onclick="if(event.target===this)closeSettings()">
   <div class="settings-modal">
-    <h3>⚙ API 设置</h3>
+    <h3>⚙ 设置</h3>
+    <div class="settings-tabs">
+      <button class="settings-tab-btn active" data-tab="api" onclick="switchSettingsTab('api')">API 连接</button>
+      <button class="settings-tab-btn" data-tab="personality" onclick="switchSettingsTab('personality')">🧠 人格风格</button>
+    </div>
+
+    <!-- Tab 1: API 连接 -->
+    <div class="settings-tab-content active" id="tab-api">
     <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:12px;">
       🆓 <b>无需配置！留空即可使用免费 AI</b>（通过 Pollinations.ai 调用真实大模型）<br>
       <span style="color:#aaa;">如配置自己的 Key，可解锁更多模型和更快速度。</span>
@@ -562,6 +642,29 @@
       <button class="btn btn-cancel" onclick="closeSettings()">取消</button>
       <button class="btn btn-save" onclick="saveSettings()">保存并测试连接</button>
     </div>
+    </div>
+
+    <!-- Tab 2: 人格风格 -->
+    <div class="settings-tab-content" id="tab-personality">
+      <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:8px;">选择人格特质与定制交互风格，AI 将据此调整回复。</p>
+
+      <!-- 人格选择 -->
+      <div class="personality-grid-mini" id="personalityGridMini"></div>
+
+      <!-- 风格参数 -->
+      <div class="style-row" id="styleRowLang"></div>
+      <div class="style-row" id="styleRowLen"></div>
+      <div class="style-row" id="styleRowDepth"></div>
+      <div id="personalityWarns"></div>
+
+      <!-- 配置方案 -->
+      <div class="conf-save-row">
+        <input type="text" id="configNameInput" placeholder="配置名称..." maxlength="15">
+        <button onclick="saveCurrentAsConfig()">保存</button>
+      </div>
+      <div class="conf-list-mini" id="configListMini"></div>
+    </div>
+
   </div>
 </div>
 
@@ -897,17 +1000,15 @@ function loadActiveAgent() {
 
 // 构建系统提示词
 function buildSystemPrompt() {
-  let prompt = '';
+  // 优先使用人格系统提示词
+  let prompt = getPersonalitySystemPrompt();
+
+  // 叠加智能体配置的提示词（如果存在）
   if (activeAgent && activeAgent.prompt) {
-    // 使用智能体配置的提示词，替换占位符
-    prompt = activeAgent.prompt.replace(/\{\{assistant_name\}\}/g, activeAgent.name || '小瑞');
+    const agentPrompt = activeAgent.prompt.replace(/\{\{assistant_name\}\}/g, activeAgent.name || '小瑞');
+    prompt = agentPrompt + '\n\n' + prompt;
   }
-  if (!prompt) {
-    prompt = `你是小瑞，一个温柔体贴的情感陪伴AI助手。你说话轻声细语，善解人意。
-你喜欢用"呀""哦""呢"等语气词，偶尔用💜🌸等emoji。
-永远先关心对方的情绪，回答简洁温暖，2-4句话即可。
-避免讨论敏感、危险话题。`;
-  }
+
   // 追加情感分析辅助信息
   prompt += `\n\n当前角色情绪状态：${emotionMap[currentEmotion]?.mood || '心情：平静'}`;
   return prompt;
@@ -989,6 +1090,155 @@ async function callAI(userMessage) {
     }
     return null;
   }
+}
+
+// ==================== 设置弹窗 Tab 切换 ====================
+function switchSettingsTab(tab) {
+  document.querySelectorAll('.settings-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.settings-tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + tab));
+  if (tab === 'personality') renderPersonalityPanel();
+}
+
+// ==================== 人格风格系统 ====================
+const PERSONALITY_PRESETS = {
+  professional: { name:'专业型', emoji:'💼', desc:'严谨精准，条理清晰', defaults:{lang:'formal',len:'detailed',depth:'expert'}, prompt:'你是小瑞，一位专业严谨的AI助手。请用精准的语言、清晰的逻辑回答。分点陈述，提供专业见解。' },
+  friendly:     { name:'友好型', emoji:'😊', desc:'温暖亲切，善解人意', defaults:{lang:'casual',len:'detailed',depth:'beginner'}, prompt:'你是小瑞，一位温暖友善的AI伴侣。请用亲切自然的语气交流，多用💜🌸等emoji，主动关心对方。' },
+  humorous:     { name:'幽默型', emoji:'😄', desc:'风趣机灵，爱开玩笑', defaults:{lang:'casual',len:'concise',depth:'beginner'}, prompt:'你是小瑞，一位幽默风趣的AI伙伴。请用轻松诙谐的方式回应，善于使用俏皮话和夸张比喻，回复简洁有力。' },
+  rigorous:     { name:'严谨型', emoji:'🔍', desc:'逻辑严密，滴水不漏', defaults:{lang:'formal',len:'detailed',depth:'expert'}, prompt:'你是小瑞，一位严谨求真的AI助手。每个观点要有逻辑支撑，先结论再论证后总结。不确定的信息要明确标注。' },
+  creative:     { name:'创意型', emoji:'🎨', desc:'天马行空，打破常规', defaults:{lang:'casual',len:'detailed',depth:'advanced'}, prompt:'你是小瑞，一位富有创造力的AI灵感伙伴。请用独特视角看问题，多角度发散，善用🌟✨emoji激发灵感。' }
+};
+
+const STYLE_META = {
+  lang: { label:'语言风格', opts:{ formal:{label:'正式',hint:'用词规范，句式完整'}, casual:{label:'口语化',hint:'亲切自然，像朋友聊天'} } },
+  len:  { label:'回复长度', opts:{ concise:{label:'简洁',hint:'言简意赅，一针见血'}, detailed:{label:'详细',hint:'充分展开，娓娓道来'} } },
+  depth:{ label:'专业深度', opts:{ beginner:{label:'入门',hint:'通俗易懂'}, advanced:{label:'进阶',hint:'有一定深度'}, expert:{label:'专家',hint:'深入透彻'} } }
+};
+
+let personalityConfig = { personality:'friendly', lang:'casual', len:'detailed', depth:'beginner' }; // 当前激活
+
+function loadPersonalityConfig() {
+  try { const saved = localStorage.getItem('ec_personality'); if (saved) { const p=JSON.parse(saved); if (PERSONALITY_PRESETS[p.personality]) personalityConfig=p; } } catch(e){}
+}
+function savePersonalityConfig() { localStorage.setItem('ec_personality', JSON.stringify(personalityConfig)); }
+
+function getPersonalitySystemPrompt() {
+  const preset = PERSONALITY_PRESETS[personalityConfig.personality];
+  let p = preset.prompt + '\n';
+  if (personalityConfig.lang === 'formal')   p += '【语言】使用正式语体，避免口语词和emoji。\n';
+  else p += '【语言】使用口语化语体，可用语气词（呀、呢、哦）和emoji。\n';
+  if (personalityConfig.len === 'concise')    p += '【长度】回复简洁精炼，2-4句话。\n';
+  else p += '【长度】回复充分展开，提供丰富细节。\n';
+  if (personalityConfig.depth === 'beginner')  p += '【深度】通俗易懂，避免术语。\n';
+  else if (personalityConfig.depth === 'advanced') p += '【深度】可适当使用专业术语。\n';
+  else p += '【深度】专家级分析，无需简化术语。\n';
+  return p;
+}
+
+// 切换人格
+function setPersonality(type) {
+  const preset = PERSONALITY_PRESETS[type];
+  if (!preset) return;
+  personalityConfig = { personality:type, lang:preset.defaults.lang, len:preset.defaults.len, depth:preset.defaults.depth };
+  savePersonalityConfig();
+  renderPersonalityPanel();
+}
+
+// 切换风格参数
+function setStyle(key, val) {
+  personalityConfig[key] = val;
+  savePersonalityConfig();
+  renderPersonalityPanel();
+}
+
+// 获取联动警告
+function getPersonalityWarnings() {
+  const preset = PERSONALITY_PRESETS[personalityConfig.personality];
+  const d = preset.defaults;
+  const w = [];
+  if (personalityConfig.lang !== d.lang) w.push('推荐「'+STYLE_META.lang.opts[d.lang].label+'」');
+  if (personalityConfig.len !== d.len)   w.push('推荐「'+STYLE_META.len.opts[d.len].label+'」');
+  if (personalityConfig.depth !== d.depth) w.push('推荐「'+STYLE_META.depth.opts[d.depth].label+'」');
+  return w;
+}
+
+// 渲染人格面板
+function renderPersonalityPanel() {
+  // 人格卡片
+  const grid = document.getElementById('personalityGridMini');
+  if (!grid) return;
+  let h = '';
+  for (const [k,v] of Object.entries(PERSONALITY_PRESETS)) {
+    const act = k === personalityConfig.personality ? ' active' : '';
+    h += `<div class="pcard-mini${act}" onclick="setPersonality('${k}')"><div class="em">${v.emoji}</div><div class="nm">${v.name}</div><div class="ds">${v.desc}</div></div>`;
+  }
+  grid.innerHTML = h;
+
+  // 风格参数
+  renderStyleRow('styleRowLang', 'lang');
+  renderStyleRow('styleRowLen', 'len');
+  renderStyleRow('styleRowDepth', 'depth');
+
+  // 联动警告
+  const warns = getPersonalityWarnings();
+  document.getElementById('personalityWarns').innerHTML = warns.length
+    ? '<div class="p-warn">⚠ '+warns.join(' · ')+'</div>' : '';
+
+  // 配置方案列表
+  renderConfigListMini();
+}
+
+function renderStyleRow(containerId, key) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const meta = STYLE_META[key];
+  let h = `<div class="sl">${meta.label}</div><div class="style-opts">`;
+  for (const [val, opt] of Object.entries(meta.opts)) {
+    const act = val === personalityConfig[key] ? ' active' : '';
+    h += `<div class="style-opt${act}" onclick="setStyle('${key}','${val}')">${opt.label}</div>`;
+  }
+  h += '</div>';
+  container.innerHTML = h;
+}
+
+// 配置方案 CRUD
+function loadPersonConfigs() { try { return JSON.parse(localStorage.getItem('ec_person_configs')||'[]'); }catch{ return []; } }
+function savePersonConfigs(arr) { localStorage.setItem('ec_person_configs', JSON.stringify(arr)); }
+
+function saveCurrentAsConfig() {
+  const nameEl = document.getElementById('configNameInput');
+  const name = (nameEl?.value||'').trim();
+  if (!name) return;
+  const cfgs = loadPersonConfigs();
+  cfgs.push({ id: Date.now().toString(36), name, ...personalityConfig, createdAt: new Date().toISOString() });
+  savePersonConfigs(cfgs);
+  if (nameEl) nameEl.value = '';
+  renderConfigListMini();
+}
+
+function applyPersonConfig(id) {
+  const cfgs = loadPersonConfigs();
+  const c = cfgs.find(x => x.id === id);
+  if (!c) return;
+  personalityConfig = { personality:c.personality, lang:c.lang, len:c.len, depth:c.depth };
+  savePersonalityConfig();
+  renderPersonalityPanel();
+}
+
+function delPersonConfig(id, e) {
+  e.stopPropagation();
+  savePersonConfigs(loadPersonConfigs().filter(x => x.id !== id));
+  renderConfigListMini();
+}
+
+function renderConfigListMini() {
+  const list = document.getElementById('configListMini');
+  if (!list) return;
+  const cfgs = loadPersonConfigs();
+  if (!cfgs.length) { list.innerHTML = '<div style="text-align:center;color:var(--text-light);font-size:0.75rem;padding:6px;">暂无保存的配置</div>'; return; }
+  list.innerHTML = cfgs.map(c => {
+    const preset = PERSONALITY_PRESETS[c.personality]||PERSONALITY_PRESETS.friendly;
+    return `<div class="conf-item-mini" onclick="applyPersonConfig('${c.id}')"><div><b>${preset.emoji} ${c.name}</b> <span style="color:var(--text-light);font-size:0.7rem;">${preset.name}</span></div><span class="del" onclick="delPersonConfig('${c.id}',event)">✕</span></div>`;
+  }).join('');
 }
 
 // ==================== API 设置弹窗 ====================
@@ -1657,6 +1907,9 @@ function pokeCharacter() {
 // ==================== 初始化 ====================
 function init() {
   initEmojiPicker();
+
+  // 加载人格配置
+  loadPersonalityConfig();
 
   // 加载控制台配置的智能体
   loadActiveAgent();

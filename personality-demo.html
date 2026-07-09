@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>人格风格系统 — 独立演示</title>
+<style>
+/* ==================== 人格面板样式 ==================== */
+:root {
+  --bg: #f5f0eb;
+  --card: #fff;
+  --text: #2c2c2c;
+  --text-light: #7a7a7a;
+  --accent: #8b5cf6;
+  --accent-light: #ede9fe;
+  --border: #e5e0db;
+  --danger: #ef4444;
+  --success: #22c55e;
+  --radius: 12px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+.container {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* 卡片 */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* 当前状态 */
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--accent-light);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+}
+
+.status-bar .tag {
+  background: var(--accent);
+  color: #fff;
+  padding: 0.25rem 0.6rem;
+  border-radius: 99px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.status-bar .info {
+  font-size: 0.85rem;
+  color: #6d28d9;
+}
+
+/* 人格选择器 */
+.personality-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+.personality-card {
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.personality-card:hover {
+  border-color: var(--accent);
+  background: #faf9fe;
+}
+
+.personality-card.active {
+  border-color: var(--accent);
+  background: var(--accent-light);
+  box-shadow: 0 0 0 3px rgba(139,92,246,0.15);
+}
+
+.personality-card .emoji {
+  font-size: 1.6rem;
+  margin-bottom: 0.3rem;
+}
+
+.personality-card .name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 0.15rem;
+}
+
+.personality-card .desc {
+  font-size: 0.72rem;
+  color: var(--text-light);
+  line-height: 1.3;
+}
+
+/* 风格滑块区 */
+.param-group {
+  margin-bottom: 1.25rem;
+}
+
+.param-group:last-child { margin-bottom: 0; }
+
+.param-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.param-options {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.param-option {
+  flex: 1;
+  padding: 0.5rem 0.4rem;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 0.78rem;
+  transition: all 0.15s;
+  background: #fafaf8;
+}
+
+.param-option:hover {
+  border-color: #b0a0d0;
+}
+
+.param-option.active {
+  border-color: var(--accent);
+  background: var(--accent-light);
+  color: #5b21b6;
+  font-weight: 600;
+}
+
+.param-hint {
+  font-size: 0.72rem;
+  color: var(--text-light);
+  margin-top: 0.3rem;
+}
+
+/* 警告提示 */
+.warning {
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.8rem;
+  color: #92400e;
+  margin-top: 0.6rem;
+}
+
+.warning::before {
+  content: '⚠ ';
+}
+
+/* 配置方案列表 */
+.config-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.config-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.7rem 0.9rem;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 0.85rem;
+}
+
+.config-item:hover {
+  border-color: #b0a0d0;
+}
+
+.config-item.active {
+  border-color: var(--accent);
+  background: #faf8ff;
+}
+
+.config-item .c-name { font-weight: 600; }
+.config-item .c-detail { font-size: 0.72rem; color: var(--text-light); }
+.config-item .c-actions { display: flex; gap: 0.3rem; }
+
+.config-item .c-delete {
+  background: none;
+  border: none;
+  color: #c0c0c0;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0.15rem 0.3rem;
+  border-radius: 4px;
+}
+
+.config-item .c-delete:hover {
+  color: var(--danger);
+  background: #fef2f2;
+}
+
+/* 按钮 */
+.btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn-primary:hover { background: #7c3aed; }
+
+.btn-outline {
+  background: #fff;
+  color: var(--accent);
+  border: 1.5px solid var(--accent);
+}
+
+.btn-outline:hover { background: var(--accent-light); }
+
+.btn-row {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+/* 输入框 */
+.input-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.input:focus { border-color: var(--accent); }
+
+/* Toast */
+.toast {
+  position: fixed;
+  top: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.toast.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<div class="container">
+
+  <!-- 当前状态 -->
+  <div class="card">
+    <div class="status-bar">
+      <div class="info">
+        <span id="statusEmoji" style="margin-right:4px;">😊</span>
+        <strong id="statusName">友好型</strong> | 
+        <span id="statusLang">口语化</span> · 
+        <span id="statusLength">详细</span> · 
+        <span id="statusDepth">入门</span>
+      </div>
+      <span class="tag" id="statusTag">当前配置</span>
+    </div>
+  </div>
+
+  <!-- 人格选择 -->
+  <div class="card">
+    <div class="card-title">🧠 人格特质（5种）</div>
+    <div class="personality-grid" id="personalityGrid"></div>
+  </div>
+
+  <!-- 风格参数 -->
+  <div class="card">
+    <div class="card-title">🎚 风格自定义</div>
+    <div class="param-group" id="paramLanguageStyle"></div>
+    <div class="param-group" id="paramReplyLength"></div>
+    <div class="param-group" id="paramProfessionalDepth"></div>
+    <div id="warnings"></div>
+  </div>
+
+  <!-- 配置方案管理 -->
+  <div class="card">
+    <div class="card-title">💾 配置方案</div>
+    <div class="input-row">
+      <input class="input" id="configNameInput" placeholder="输入方案名称…" maxlength="20">
+      <button class="btn btn-primary" onclick="saveCurrentAsConfig()">保存</button>
+    </div>
+    <div class="config-list" id="configList"></div>
+  </div>
+
+</div>
+
+<!-- ================================================================ -->
+<script>
+// ==================== 数据定义 ====================
+const PERSONALITY_TEMPLATES = {
+  professional: {
+    name: '专业型', emoji: '💼', desc: '严谨、精准、条理清晰，像资深顾问',
+    defaults: { languageStyle: 'formal',   replyLength: 'detailed', professionalDepth: 'expert' },
+    systemPromptSuffix: '你是小瑞，一位专业严谨的AI助手。请以专家的身份回答，用词精准、逻辑清晰、分点陈述。回复详细但不冗长。',
+    tone: { formality: 0.9, warmth: 0.3, humor: 0.0, creativity: 0.1 }
+  },
+  friendly: {
+    name: '友好型', emoji: '😊', desc: '温暖、亲切、善解人意，像知心好友',
+    defaults: { languageStyle: 'casual',   replyLength: 'detailed', professionalDepth: 'beginner' },
+    systemPromptSuffix: '你是小瑞，一位温暖友善的AI伴侣。请用亲切自然的语气交流，多用emoji表达情感，主动关心对方感受。',
+    tone: { formality: 0.1, warmth: 1.0, humor: 0.3, creativity: 0.2 }
+  },
+  humorous: {
+    name: '幽默型', emoji: '😄', desc: '风趣、机灵、爱开玩笑，像脱口秀演员',
+    defaults: { languageStyle: 'casual',   replyLength: 'concise',  professionalDepth: 'beginner' },
+    systemPromptSuffix: '你是小瑞，一位幽默风趣的AI伙伴。请用轻松诙谐的方式回应，善于使用双关语、自嘲和夸张的比喻。回复要简洁有力。',
+    tone: { formality: 0.0, warmth: 0.7, humor: 1.0, creativity: 0.6 }
+  },
+  rigorous: {
+    name: '严谨型', emoji: '🔍', desc: '逻辑严密、论证充分、滴水不漏，像学者',
+    defaults: { languageStyle: 'formal',   replyLength: 'detailed', professionalDepth: 'expert' },
+    systemPromptSuffix: '你是小瑞，一位严谨求真的AI助手。请以学术标准要求自己，每个观点都要有逻辑支撑。对不确定的信息要明确标注。',
+    tone: { formality: 1.0, warmth: 0.1, humor: 0.0, creativity: 0.05 }
+  },
+  creative: {
+    name: '创意型', emoji: '🎨', desc: '天马行空、灵感迸发、打破常规，像艺术家',
+    defaults: { languageStyle: 'casual',   replyLength: 'detailed', professionalDepth: 'advanced' },
+    systemPromptSuffix: '你是小瑞，一位富有创造力的AI灵感伙伴。请跳出常规思维，用独特的视角看问题。多用🌟✨emoji。',
+    tone: { formality: 0.05, warmth: 0.5, humor: 0.4, creativity: 1.0 }
+  }
+};
+
+const STYLE_PARAMS = {
+  languageStyle: {
+    label: '语言风格',
+    options: {
+      formal: { label: '正式', hint: '用词规范，句式完整，语气得体' },
+      casual: { label: '口语化', hint: '亲切自然，像朋友聊天一样' }
+    }
+  },
+  replyLength: {
+    label: '回复长度',
+    options: {
+      concise: { label: '简洁', hint: '言简意赅，一针见血' },
+      detailed: { label: '详细', hint: '充分展开，娓娓道来' }
+    }
+  },
+  professionalDepth: {
+    label: '专业深度',
+    options: {
+      beginner: { label: '入门', hint: '通俗易懂，适合新人' },
+      advanced: { label: '进阶', hint: '有一定深度' },
+      expert: { label: '专家', hint: '深入透彻，专业术语无障碍' }
+    }
+  }
+};
+
+const DEFAULT_CONFIG = {
+  personalityType: 'friendly',
+  languageStyle: 'casual',
+  replyLength: 'detailed',
+  professionalDepth: 'beginner'
+};
+
+// ==================== 状态管理 ====================
+let currentConfig = { ...DEFAULT_CONFIG };
+
+// ==================== localStorage 配置 CRUD ====================
+function loadConfigs() {
+  try { return JSON.parse(localStorage.getItem('echocare_personality_configs') || '[]'); }
+  catch { return []; }
+}
+function saveConfigs(arr) { localStorage.setItem('echocare_personality_configs', JSON.stringify(arr)); }
+
+function saveCurrentAsConfig() {
+  const name = document.getElementById('configNameInput').value.trim();
+  if (!name) { toast('请输入方案名称'); return; }
+  const configs = loadConfigs();
+  const newCfg = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    name, ...currentConfig, createdAt: new Date().toISOString()
+  };
+  configs.push(newCfg);
+  saveConfigs(configs);
+  document.getElementById('configNameInput').value = '';
+  toast('配置方案已保存: ' + name);
+  renderConfigList();
+}
+
+function applyConfig(id) {
+  const configs = loadConfigs();
+  const cfg = configs.find(c => c.id === id);
+  if (!cfg) return;
+  currentConfig = { personalityType: cfg.personalityType, languageStyle: cfg.languageStyle, replyLength: cfg.replyLength, professionalDepth: cfg.professionalDepth };
+  renderAll();
+  toast('已切换方案: ' + cfg.name);
+}
+
+function delConfig(id) {
+  const configs = loadConfigs().filter(c => c.id !== id);
+  saveConfigs(configs);
+  renderConfigList();
+}
+
+// ==================== 人格-风格联动 ====================
+function changePersonality(type) {
+  const template = PERSONALITY_TEMPLATES[type];
+  currentConfig = { personalityType: type, ...template.defaults };
+  renderAll();
+}
+
+function changeStyle(key, value) {
+  currentConfig[key] = value;
+  renderAll();
+}
+
+function getWarnings() {
+  const template = PERSONALITY_TEMPLATES[currentConfig.personalityType];
+  const defaults = template.defaults;
+  const w = [];
+  for (const key of ['languageStyle', 'replyLength', 'professionalDepth']) {
+    if (currentConfig[key] !== defaults[key]) {
+      const param = STYLE_PARAMS[key];
+      w.push(`${template.name}默认推荐"${param.options[defaults[key]].label}"`);
+    }
+  }
+  return w;
+}
+
+// ==================== UI 渲染 ====================
+function renderAll() {
+  renderStatus();
+  renderPersonalityGrid();
+  renderStyleParams();
+  renderWarnings();
+  renderConfigList();
+}
+
+function renderStatus() {
+  const t = PERSONALITY_TEMPLATES[currentConfig.personalityType];
+  document.getElementById('statusEmoji').textContent = t.emoji;
+  document.getElementById('statusName').textContent = t.name;
+  document.getElementById('statusLang').textContent = STYLE_PARAMS.languageStyle.options[currentConfig.languageStyle].label;
+  document.getElementById('statusLength').textContent = STYLE_PARAMS.replyLength.options[currentConfig.replyLength].label;
+  document.getElementById('statusDepth').textContent = STYLE_PARAMS.professionalDepth.options[currentConfig.professionalDepth].label;
+}
+
+function renderPersonalityGrid() {
+  const grid = document.getElementById('personalityGrid');
+  grid.innerHTML = '';
+  for (const [key, t] of Object.entries(PERSONALITY_TEMPLATES)) {
+    const active = key === currentConfig.personalityType;
+    const div = document.createElement('div');
+    div.className = 'personality-card' + (active ? ' active' : '');
+    div.innerHTML = `<div class="emoji">${t.emoji}</div><div class="name">${t.name}</div><div class="desc">${t.desc}</div>`;
+    div.onclick = () => { if (key !== currentConfig.personalityType) changePersonality(key); };
+    grid.appendChild(div);
+  }
+}
+
+function renderStyleParams() {
+  renderParamGroup('paramLanguageStyle', 'languageStyle');
+  renderParamGroup('paramReplyLength', 'replyLength');
+  renderParamGroup('paramProfessionalDepth', 'professionalDepth');
+}
+
+function renderParamGroup(containerId, key) {
+  const container = document.getElementById(containerId);
+  const param = STYLE_PARAMS[key];
+  const activeVal = currentConfig[key];
+  // 当前选中项的 hint
+  const hint = param.options[activeVal].hint;
+
+  let html = `<div class="param-label"><span>${param.label}</span></div>`;
+  html += `<div class="param-options">`;
+  for (const [val, opt] of Object.entries(param.options)) {
+    html += `<div class="param-option${val === activeVal ? ' active' : ''}" onclick="changeStyle('${key}','${val}')">${opt.label}</div>`;
+  }
+  html += `</div><div class="param-hint">${hint}</div>`;
+  container.innerHTML = html;
+}
+
+function renderWarnings() {
+  const w = getWarnings();
+  document.getElementById('warnings').innerHTML = w.length
+    ? '<div class="warning">' + w.join('<br>') + '</div>'
+    : '';
+}
+
+function renderConfigList() {
+  const list = document.getElementById('configList');
+  const configs = loadConfigs();
+  if (!configs.length) {
+    list.innerHTML = '<div style="font-size:0.85rem;color:var(--text-light);text-align:center;padding:1rem;">暂无保存的配置方案</div>';
+    return;
+  }
+  list.innerHTML = configs.map(c => {
+    const t = PERSONALITY_TEMPLATES[c.personalityType];
+    const lang = STYLE_PARAMS.languageStyle.options[c.languageStyle].label;
+    const len  = STYLE_PARAMS.replyLength.options[c.replyLength].label;
+    const depth = STYLE_PARAMS.professionalDepth.options[c.professionalDepth].label;
+    return `
+      <div class="config-item" onclick="applyConfig('${c.id}')">
+        <div>
+          <div class="c-name">${t.emoji} ${c.name}</div>
+          <div class="c-detail">${t.name} · ${lang} · ${len} · ${depth}</div>
+        </div>
+        <div class="c-actions">
+          <button class="c-delete" onclick="event.stopPropagation();delConfig('${c.id}')" title="删除">✕</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ==================== Toast ====================
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+// ==================== 初始化 ====================
+renderAll();
+</script>
+
+</body>
+</html>
